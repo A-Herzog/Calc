@@ -1,0 +1,7 @@
+.vscode
+.tmp
+bin
+dist
+Calculator.exe
+Calculator_Linux_MacOS.zip
+desktop-app/2_Sign.bat

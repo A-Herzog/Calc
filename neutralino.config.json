@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "Calculator",
+  "version": "2.0.0",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/docs/",
+  "url": "/index.html",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": false,
+    "writeToLogFile": false
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.*",
+	  "window.*",
+    "debug.log",
+    "filesystem.*"
+  ],
+  "modes": {
+    "window": {
+      "title": "Calculator",
+      "width": 1000,
+      "height": 280,
+      "minWidth": 525,
+      "minHeight": 280,
+      "center": true,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/docs/favicon.ico",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": false,
+      "useSavedState": false
+    }
+  },
+  "cli": {
+    "binaryName": "Calculator",
+    "resourcesPath": "/docs/",
+    "clientLibrary": "docs/libs/neutralino.js",
+    "binaryVersion": "5.0.0",
+    "clientVersion": "5.0.1"
+  }
+}

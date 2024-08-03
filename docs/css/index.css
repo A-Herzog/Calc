@@ -1,0 +1,48 @@
+.navbar {
+  padding: 0;
+}
+
+.navbar-nav {
+  padding: 0;
+}
+
+.menuButtonTitleShort {
+  display: none;
+}
+
+@media only screen and (max-width: 1050px) {
+  .menuButtonTitle {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .menuTabTitle {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1150px) {
+  .menuButtonTitleLong {
+    display: none;
+  }
+  .menuButtonTitleShort {
+    display: inline;
+  }
+}
+
+table.table-fit {
+  width: auto !important;
+  table-layout: auto !important;
+}
+
+table.table-fit thead th, table.table-fit tbody td {
+  width: auto !important;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+math {
+  font-size: 107%;
+  font-family: sans-serif;
+}
