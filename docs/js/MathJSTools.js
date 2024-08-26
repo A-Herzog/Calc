@@ -151,19 +151,23 @@ function integrate(...params) {
 }
 
 /* Permanent extensions */
-math.import({
-  sqr: param=>param*param,
-  ln: param=>math.log(param),
-  lg: param=>math.log10(param),
-  ld: param=>math.log2(param),
-  binom: (n,k)=>binomDirect(n,k),
-  binomial: (n,k)=>binomDirect(n,k),
-  eye: n=>eye(n),
-  t: m=>math.transpose(m),
-  sumx: sumX,
-  prodx: prodX,
-  integrate: integrate,
-});
+function loadMathExtensions() {
+  if (!math.import) {setTimeout(loadMathExtensions,100); return;}
+  math.import({
+    sqr: param=>param*param,
+    ln: param=>math.log(param),
+    lg: param=>math.log10(param),
+    ld: param=>math.log2(param),
+    binom: (n,k)=>binomDirect(n,k),
+    binomial: (n,k)=>binomDirect(n,k),
+    eye: n=>eye(n),
+    t: m=>math.transpose(m),
+    sumx: sumX,
+    prodx: prodX,
+    integrate: integrate,
+  });
+}
+loadMathExtensions();
 
 /**
  * Preprocesses an input string before giving it to Math.evaluate(...).

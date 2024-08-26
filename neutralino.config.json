@@ -5,7 +5,7 @@
   "defaultMode": "window",
   "port": 0,
   "documentRoot": "/docs/",
-  "url": "/index.html",
+  "url": "/index_webapp.html",
   "enableServer": true,
   "enableNativeAPI": true,
   "tokenSecurity": "one-time",

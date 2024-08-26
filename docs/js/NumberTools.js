@@ -158,7 +158,7 @@ function getNotNegativeInt(elementOrString) {
  * @returns Formatted number
  */
 function formatNumber(number, digits) {
-  if (typeof(digits)=='undefined') return number.toLocaleString({useGrouping: false});
+  if (typeof(digits)=='undefined') return number.toLocaleString(undefined, {useGrouping: false});
 
   let usedDigits=0;
   let x=number%1;

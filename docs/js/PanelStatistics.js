@@ -18,6 +18,7 @@ export {StatisticsPanel};
 
 import {Panel} from './Panel.js';
 import {getFloat, formatNumber} from './NumberTools.js';
+import {ibeta} from '../libs/jstat-special.js';
 import {language} from './Language.js';
 
 
@@ -166,7 +167,7 @@ class StatisticsPanel extends Panel {
     while (max-min>10E-8) {
       const m=(min+max)/2;
       const x=nu/(m**2+nu);
-      const p=1-0.5*jStat.ibeta(x,nu/2,0.5);
+      const p=1-0.5*ibeta(x,nu/2,0.5);
       if (p>level) max=m; else min=m;
     }
 

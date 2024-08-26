@@ -75,7 +75,7 @@ class Tabs {
       const li=document.createElement("li");
       ul.appendChild(li);
       li.className="nav-item";
-      const a=document.createElement("a");
+      const a=document.createElement("button");
       li.appendChild(a);
       a.className="nav-link"+((index==0)?" active":"");
       a.style.cursor="pointer";
@@ -96,7 +96,7 @@ class Tabs {
     langButton.title=language.GUI.switchLanguageHint;
     langButton.onclick=()=>{
       localStorage.setItem('selectedLanguage',language.GUI.switchLanguageMode);
-      document.location.href="?";
+      document.location.href=(isDesktopApp?"index_webapp.html":"")+"?";
     };
     const langSpanOuter=document.createElement("span");
     langButton.appendChild(langSpanOuter);
@@ -132,7 +132,7 @@ class Tabs {
     a.className="dropdown-item";
     a.innerHTML=language.GUI.tabColorModeLight;
     if (selectedColorMode!=null && document.documentElement.dataset.bsTheme!='dark') a.classList.add("bi-check");
-    a.href="?";
+    a.href=(isDesktopApp?"index_webapp.html":"")+"?";
     a.onclick=()=>localStorage.setItem('selectedColorMode','light');
     colorUl.appendChild(li=document.createElement("li"));
     li.role="tab";
@@ -140,7 +140,7 @@ class Tabs {
     a.className="dropdown-item";
     a.innerHTML=language.GUI.tabColorModeDark;
     if (selectedColorMode!=null && document.documentElement.dataset.bsTheme=='dark') a.classList.add("bi-check");
-    a.href="?";
+    a.href=(isDesktopApp?"index_webapp.html":"")+"?";
     a.onclick=()=>localStorage.setItem('selectedColorMode','dark');
     colorUl.appendChild(li=document.createElement("li"));
     li.role="tab";
@@ -153,7 +153,7 @@ class Tabs {
     } else {
       a.innerHTML=language.GUI.tabColorModeSystemDefault;
     }
-    a.href="?";
+    a.href=(isDesktopApp?"index_webapp.html":"")+"?";
     a.onclick=()=>localStorage.removeItem('selectedColorMode');
 
     return nav;

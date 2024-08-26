@@ -29,7 +29,6 @@ import {language, initLanguage} from './js/Language.js';
 let selectedLanguage=localStorage.getItem('selectedLanguage');
 if (selectedLanguage==null) selectedLanguage=(navigator.language || navigator.userLanguage).toLocaleLowerCase();
 if (selectedLanguage.indexOf("-")>=0) selectedLanguage=selectedLanguage.substring(0,selectedLanguage.indexOf("-"));
-console.log(selectedLanguage);
 if (selectedLanguage.length!='default') document.documentElement.lang=selectedLanguage;
 initLanguage();
 document.getElementsByTagName('title')[0].innerHTML=language.GUI.name;
@@ -57,7 +56,7 @@ mainContent.appendChild(tabs.main);
 
 /* Make GUI visible */
 mainContent.style.display="";
-infoLoading.style.display="none";
+if (typeof(infoLoading)!='undefined') infoLoading.style.display="none";
 
 /* Calculate size for window */
 setTimeout(()=>{

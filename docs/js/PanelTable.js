@@ -73,7 +73,6 @@ class TablePanel extends Panel {
     label.htmlFor=this.#mode;
     this.#mode.onchange=()=>this.#updateTable();
 
-
     /* Function input - line 1 */
     div.appendChild(this.#functionLine1=document.createElement("span"));
     this.#functionInput=this.#createInput(this.#functionLine1,500,"x^2",language.table.functionPlaceholder,"f(x):=");
@@ -195,9 +194,9 @@ class TablePanel extends Panel {
     for (let x=minX;x<=maxX;x+=stepWide) {
       try {
         const y=expr.evaluate({x: x});
-        this.#outputLine(this.#tableBody,"td",x,formatMathResult(y));
+        this.#outputLine(this.#tableBody,"td",formatNumber(x),formatMathResult(y));
       } catch (e) {
-        this.#outputLine(this.#tableBody,"td",x,"???");
+        this.#outputLine(this.#tableBody,"td",formatNumber(x),"???");
       }
     }
   }
