@@ -53,6 +53,12 @@ tabs.add(language.GUI.tabStatistics,"bar-chart",new StatisticsPanel());
 /* Add tabs to DOM */
 mainContent.appendChild(tabs.nav);
 mainContent.appendChild(tabs.main);
+if (!isDesktopApp) {
+  const footer=document.createElement("footer");
+  footer.className="page-footer font-small small border-top p-2 "+((document.documentElement.dataset.bsTheme=='light')?"bg-light":"bg-dark");
+  footer.innerHTML=language.GUI.name+' &copy; <a href="https://github.com/A-Herzog" target="_blank">Alexander Herzog</a> &middot; <a href="https://github.com/A-Herzog/Calc" target="_blank" class="bi-github"> GitHub</a>';
+  document.body.appendChild(footer);
+}
 
 /* Make GUI visible */
 mainContent.style.display="";
