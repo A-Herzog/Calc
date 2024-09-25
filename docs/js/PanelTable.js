@@ -45,6 +45,9 @@ class TablePanel extends Panel {
   #tableBody;
   #tableData="";
 
+  /** Maximum number of lines to be displayed */
+  MAX_LINES=10_000;
+
   constructor() {
     super();
   }
@@ -191,13 +194,19 @@ class TablePanel extends Panel {
 
     /* Build output */
     this.#outputLine(this.#tableHead,"th","x","f(x)");
+    let count=0;
     for (let x=minX;x<=maxX;x+=stepWide) {
+      if (count>this.MAX_LINES) {
+        this.#outputLine(this.#tableBody,"td","...","...");
+        break;
+      }
       try {
         const y=expr.evaluate({x: x});
         this.#outputLine(this.#tableBody,"td",formatNumber(x),formatMathResult(y));
       } catch (e) {
         this.#outputLine(this.#tableBody,"td",formatNumber(x),"???");
       }
+      count++;
     }
   }
 
@@ -226,7 +235,12 @@ class TablePanel extends Panel {
     this.#outputLine(this.#tableHead,"th","n","a(n)");
     this.#outputLine(this.#tableBody,"td","0",formatMathResult(a0));
     let a=a0;
+    let count=0;
     for (let i=0;i<steps;i++) {
+      if (count>this.MAX_LINES) {
+        this.#outputLine(this.#tableBody,"td","...","...");
+        break;
+      }
       try {
         a=expr.evaluate({a: a});
         this.#outputLine(this.#tableBody,"td",i+1,formatMathResult(a));
@@ -234,6 +248,7 @@ class TablePanel extends Panel {
         this.#outputLine(this.#tableBody,"td",i+1,"???");
         break;
       }
+      count++;
     }
   }
 

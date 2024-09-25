@@ -589,6 +589,14 @@ class PrimeFactorsPanel extends Panel {
 
   #smallPrimeNumbersBigInt=null;
 
+  #sqrtNewtonIteration(n, x0=1n) {
+    const x1 = ((n / x0) + x0) >> 1n;
+    if (x0 === x1 || x0 === (x1 - 1n)) {
+        return x0;
+    }
+    return this.#sqrtNewtonIteration(n, x1);
+  }
+
   #factorize(num) {
     if (this.#smallPrimeNumbersBigInt==null) this.#smallPrimeNumbersBigInt=this.#smallPrimeNumbers.map(n=>BigInt(n));
 
@@ -596,8 +604,17 @@ class PrimeFactorsPanel extends Panel {
 
     while (num>1) {
       let ok=false;
-      for (let prime of this.#smallPrimeNumbersBigInt) if (num%prime==0) {factors.push(prime); num=num/prime; ok=true; break;}
-      if (!ok) for (let test=20000;;test++) {const bigTest=BigInt(test); if (num%bigTest==0) {factors.push(bigTest); num/=bigTest; break;}}
+      for (let prime of this.#smallPrimeNumbersBigInt) {
+        if (num%prime==0) {factors.push(prime); num=num/prime; ok=true; break;}
+        if (prime*prime>num) {factors.push(num); num=1; ok=true; break;}
+      }
+      if (!ok) {
+        const maxTest=this.#sqrtNewtonIteration(num)+1n;
+        for (let test=50003;test<=maxTest;test+=2) {
+          const bigTest=BigInt(test); if (num%bigTest==0) {factors.push(bigTest); num/=bigTest; ok=true; break;}
+        }
+      }
+      if (!ok) {factors.push(num); num=1;}
     }
 
     return factors;
@@ -606,11 +623,10 @@ class PrimeFactorsPanel extends Panel {
   #collectFactors(factors) {
     const collected=new Map();
 
-    const bigOne=BigInt(1);
     for (let factor of factors) {
       let old=collected.get(factor);
-      if (typeof(old)=='undefined') old=BigInt(0);
-      collected.set(factor,old+bigOne);
+      if (typeof(old)=='undefined') old=0n;
+      collected.set(factor,old+1n);
     }
 
     return collected;
@@ -679,16 +695,15 @@ class PrimeFactorsPanel extends Panel {
   }
 
   #getPhi(collected) {
-    const bigOne=BigInt(1);
-    let result=BigInt(1);
+    let result=1n;
 
     for (let key of Array.from(collected.keys())) {
       const power=collected.get(key);
       if (power==1) {
-        result=result*(key-bigOne);
+        result=result*(key-1n);
       } else {
-        /* We cannot use fractions with BigInt: result=result*(key**power)*(bigOne-bigOne/key); */
-        result=result*(key**(power-bigOne))*(key-bigOne);
+        /* We cannot use fractions with BigInt: result=result*(key**power)*(1n-1n/key); */
+        result=result*(key**(power-1n))*(key-1n);
       }
     }
 
@@ -696,7 +711,7 @@ class PrimeFactorsPanel extends Panel {
   }
 
   #update() {
-    const tooBig=BigInt("999999999999");
+    const tooBig=BigInt("99_999_999_999_999".replaceAll("_",""));
     let num1=getPositiveBigInt(this.#input1);
     let num2=getPositiveBigInt(this.#input2);
     if (num1!=null && num1>tooBig) num1=null;
