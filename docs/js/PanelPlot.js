@@ -70,16 +70,22 @@ class PlotPanel extends Panel {
     const canvasInfo=document.createElement("div");
     this._panel.appendChild(canvasInfo);
     canvasInfo.className="mt-3";
-    const span=document.createElement("span");
+    const span=document.createElement("div");
     canvasInfo.appendChild(span);
+    span.className="small";
     span.innerHTML=language.plot.zoomInfo;
     const button=document.createElement("button");
     canvasInfo.appendChild(button);
     button.type="button";
     button.className="btn btn-warning btn-sm bi-zoom-out";
-    button.style.marginLeft="10px";
     button.innerHTML=" "+language.plot.resetZoom;
-    button.onclick=()=>this.#chart.resetZoom();
+    button.onclick=()=>{
+      this.#inputXMin.value="-10";
+      this.#inputXMax.value="10";
+      this.#inputYMin.value="-10";
+      this.#inputYMax.value="10";
+      this.#updateChart();
+    }
     this.#addExportButton(canvasInfo,"clipboard",language.GUI.copy,language.GUI.copyDiagramTable,language.GUI.copyDiagramImage,()=>this.#copyTable(),()=>this.#copyChart());
     this.#addExportButton(canvasInfo,"download",language.GUI.save,language.GUI.saveDiagramTable,language.GUI.saveDiagramImage,()=>this.#saveTable(),()=>this.#saveChart());
 
@@ -243,6 +249,7 @@ class PlotPanel extends Panel {
               modifierKey: "ctrl",
             },
             mode: 'xy',
+            onZoomComplete: ()=>this.#userClickZoomDone()
           }
         },
         tooltip: {
@@ -341,6 +348,29 @@ class PlotPanel extends Panel {
     }
 
     this.#tableData=table.join("\n");
+  }
+
+  #justZooming=false;
+
+  #userClickZoomDone() {
+    if (this.#justZooming) return;
+    const minXIndex=this.#chart.options.scales.x.min;
+    const maxXIndex=this.#chart.options.scales.x.max;
+    const minX=this.#xValues[Math.max(0,minXIndex)];
+    const maxX=this.#xValues[Math.min(this.#xValues.length-1,maxXIndex)];
+    const minY=this.#chart.options.scales.y.min;
+    const maxY=this.#chart.options.scales.y.max;
+    this.#inputXMin.value=formatNumber(minX);
+    this.#inputXMax.value=formatNumber(maxX);
+    this.#inputYMin.value=formatNumber(minY);
+    this.#inputYMax.value=formatNumber(maxY);
+
+    setTimeout(()=>{
+      this.#justZooming=true;
+      this.#chart.resetZoom();
+      this.#updateChart();
+      this.#justZooming=false;
+    },0);
   }
 
   #copyTable() {
