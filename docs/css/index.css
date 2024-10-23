@@ -1,5 +1,10 @@
 .navbar {
   padding: 0;
+  user-select: none;
+}
+
+footer, label {
+  user-select: none;
 }
 
 .navbar-nav {
