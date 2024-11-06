@@ -76,7 +76,8 @@ class UnitsConverterPanel extends Panel {
       {name: language.units.areaHektar, unit: "ha", factor: 10000, wiki: language.units.areaHektarWiki},
       {name: language.units.areaAr, unit: "a", factor: 100, wiki: language.units.areaArWiki},
       {name: language.units.areaMorgen, unit: "mg", factor: 2500, wiki: language.units.areaMorgenWiki},
-      {name: language.units.areaSoccerFields, factor: 7140, wiki: language.units.areaSoccerFieldsWiki}
+      {name: language.units.areaSoccerFields, factor: 7140, wiki: language.units.areaSoccerFieldsWiki},
+      {name: language.units.areaSaarland, factor: 1000000*2569.69, wiki: language.units.areaSaarlandWiki}
     ]);
 
     this.#buildUnitsPanel(language.units.volume,[
@@ -97,7 +98,13 @@ class UnitsConverterPanel extends Panel {
       {name: language.units.velocityMs, unit: language.units.velocityMsUnit, factor: 3.6},
       {name: language.units.velocityMih, unit: "miles/h", factor: 1.609344},
       {name: language.units.velocityKnots, unit: language.units.velocityKnotsUnit, factor: 1.852, wiki: language.units.velocityKnotsWiki},
-      {name: language.units.velocityMach, unit: "Mach", factor: 1236, wiki: language.units.velocityMachWiki}
+      {name: language.units.velocityMach, unit: "Mach", factor: 1236, wiki: language.units.velocityMachWiki},
+      {name: language.units.velocityLightspeed, factor: 3.6*299792458, wiki: language.units.velocityLightspeedWiki}
+    ]);
+
+    this.#buildUnitsPanel(language.units.power,[
+      {name: language.units.powerW, unit: "W", initialValue: 1, wiki: language.units.powerWWiki},
+      {name: language.units.powerPS, unit: language.units.powerPSUnit, factor: 735.49875, wiki: language.units.powerPSWiki},
     ]);
 
     this.#buildUnitsPanel(language.units.energy,[
