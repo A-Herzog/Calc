@@ -54,6 +54,7 @@ class PlotPanel extends Panel {
 
   _firstShow() {
     let line;
+    let button;
 
     /* Chart */
     this.#canvas=document.createElement("canvas");
@@ -74,8 +75,7 @@ class PlotPanel extends Panel {
     canvasInfo.appendChild(span);
     span.className="small";
     span.innerHTML=language.plot.zoomInfo;
-    const button=document.createElement("button");
-    canvasInfo.appendChild(button);
+    canvasInfo.appendChild(button=document.createElement("button"));
     button.type="button";
     button.className="btn btn-warning btn-sm bi-zoom-out";
     button.innerHTML=" "+language.plot.resetZoom;
@@ -84,6 +84,24 @@ class PlotPanel extends Panel {
       this.#inputXMax.value="10";
       this.#inputYMin.value="-10";
       this.#inputYMax.value="10";
+      this.#updateChart();
+    }
+    canvasInfo.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="btn btn-warning btn-sm bi-aspect-ratio";
+    button.style.marginLeft="10px";
+    button.innerHTML=" "+language.plot.resetZoomAspectRatio;
+    button.onclick=()=>{
+      const ratio=this.#canvas.width/this.#canvas.height;
+      const xMin=getFloat(this.#inputXMin.value);
+      const xMax=getFloat(this.#inputXMax.value);
+      const yMin=getFloat(this.#inputYMin.value);
+      const yMax=getFloat(this.#inputYMax.value);
+      if (xMin==null || xMax==null || yMin==null || yMax==null) return;
+      const xRange=xMax-xMin;
+      const yMiddle=(yMin+yMax)/2;
+      this.#inputYMin.value=formatNumber(yMiddle-xRange/ratio/2);
+      this.#inputYMax.value=formatNumber(yMiddle+xRange/ratio/2);
       this.#updateChart();
     }
     this.#addExportButton(canvasInfo,"clipboard",language.GUI.copy,language.GUI.copyDiagramTable,language.GUI.copyDiagramImage,()=>this.#copyTable(),()=>this.#copyChart());
