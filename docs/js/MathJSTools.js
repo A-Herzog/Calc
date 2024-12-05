@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export {preprocessInput, formatMathResult}
+export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
 
 import {formatNumber} from './NumberTools.js';
 
@@ -89,7 +89,7 @@ function preprocessMultiFunction(name, params) {
 }
 
 /**
- * Defintion of a function of type sumx("term","variable",min,max) summing "term" over variable "variable" from min to max (in steps of size 1)
+ * Definition of a function of type sumx("term","variable",min,max) summing "term" over variable "variable" from min to max (in steps of size 1)
  * @param  {...any} params Function parameters
  * @returns Sum
  */
@@ -107,7 +107,7 @@ function sumX(...params) {
 }
 
 /**
- * Defintion of a function of type prodx("term","variable",min,max) multiplying "term" over variable "variable" from min to max (in steps of size 1)
+ * Definition of a function of type prodx("term","variable",min,max) multiplying "term" over variable "variable" from min to max (in steps of size 1)
  * @param  {...any} params Function parameters
  * @returns Product
  */
@@ -150,9 +150,11 @@ function integrate(...params) {
   /* Rectangle rule: return sum*(expr.max-expr.min)/(STEPS-1); */
 }
 
-/* Permanent extensions */
-function loadMathExtensions() {
-  if (!math.import) {setTimeout(loadMathExtensions,100); return;}
+/**
+ * Loads the MathJS extensions
+ */
+function loadMathJSExtensions() {
+  if (!math || !math.import) {setTimeout(loadMathExtensions,100); return;}
   math.import({
     sqr: param=>param*param,
     ln: param=>math.log(param),
@@ -167,7 +169,6 @@ function loadMathExtensions() {
     integrate: integrate,
   });
 }
-loadMathExtensions();
 
 /**
  * Preprocesses an input string before giving it to Math.evaluate(...).
@@ -189,6 +190,11 @@ function formatMathResult(result) {
 
   /* Function name */
   if (typeof(result)=='function') return '';
+
+  /* Boolean */
+  if (typeof(result)=='boolean') {
+    return result?1:0;
+  }
 
   /* Reel number */
   if (typeof(result)=='number') return formatNumber(result,12);
@@ -220,6 +226,11 @@ function formatMathResult(result) {
      }
   }
 
+  /* Eigenvectors */
+  if (typeof(result.eigenvectors)=='object') {
+    return result.eigenvectors.map(eig=>formatMathResult(eig.value)+": "+formatMathResult(eig.vector)).join("; ");
+  }
+
   /* Matrix or vector */
   if (typeof(result.size)=='function') {
     const size=result.size();
@@ -232,6 +243,9 @@ function formatMathResult(result) {
       /* Matrix */
       return "["+arr.map(row=>"["+row.map(cell=>formatMathResult(cell)).join(";")+"]").join(";")+"]";
     }
+  }
+  if (typeof(result.length)=='number') {
+    return "["+result.map(cell=>formatMathResult(cell)).join(";")+"]";
   }
 
   /* Unknown object format */

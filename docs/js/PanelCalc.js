@@ -22,8 +22,13 @@ import {CalcPanelSubKeys} from './PanelCalcSubKeys.js';
 import {CalcPanelSubConsts} from './PanelCalcSubConsts.js';
 import {CalcPanelSubFunctions} from './PanelCalcSubFunctions.js';
 import {CalcPanelSubInfo} from './PanelCalcSubInfo.js';
-import {preprocessInput, formatMathResult} from './MathJSTools.js';
+import {preprocessInput, formatMathResult, loadMathJSExtensions} from './MathJSTools.js';
+import {loadMathJSDistributionExtensions} from './MathJSDistributionTools.js';
 import {language} from './Language.js';
+
+
+loadMathJSExtensions();
+loadMathJSDistributionExtensions();
 
 
 /**
