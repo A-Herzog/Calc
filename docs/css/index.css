@@ -7,6 +7,10 @@ footer, label {
   user-select: none;
 }
 
+footer a {
+  color: blue;
+}
+
 .navbar-nav {
   padding: 0;
 }
@@ -50,4 +54,61 @@ table.table-fit thead th, table.table-fit tbody td {
 math {
   font-size: 107%;
   font-family: sans-serif;
+}
+
+ul.tree, ul.tree ul {
+  list-style: none;
+  user-select: none;
+}
+
+ul.tree {
+  padding: 0;
+}
+
+ul.tree li {
+  cursor: pointer;
+}
+
+ul.tree li span {
+  padding: 0px 2px;
+}
+
+ul.tree li span.selected {
+  background-color: rgba(192,192,255,0.5);
+  border: 1px solid blue;
+  border-radius: 2px;
+}
+
+[data-bs-theme="dark"] {
+  ul.tree li span.selected {
+    background-color: blue;
+    border: 1px solid rgb(192,192,255);
+    border-radius: 2px;
+  }
+}
+
+.tree li.closed {
+  font-weight: bold;
+}
+
+.tree li.closed ul {
+  display: none;
+}
+
+.tree li.open, .tree li.closed {
+  font-weight: bold;
+}
+
+.tree li.leaf {
+  font-weight: normal;
+}
+
+nav {
+  background-color: white;
+}
+
+[data-bs-theme="dark"] {
+  nav {
+    background-color: #212529;
+  }
 }

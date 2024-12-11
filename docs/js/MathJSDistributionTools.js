@@ -14,37 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export {gaussianRandomPolar, zeta, distributions, loadMathJSDistributionExtensions}
+export {gaussianRandomPolar, getDistributions, loadMathJSDistributionExtensions}
 
 import {formatNumber} from './NumberTools.js';
 import {binomDirect as mathBinom} from './MathJSTools.js';
 import {factorial, gammafn, lowRegGamma, gammap, betafn, betaln, ibeta, erf, erfc} from '../libs/jstat-special.js';
+import {language} from './Language.js';
 
-
-/**
- * Calculates the value of the Zeta function for an real, positive argument.
- * @param {Number} s Argument of the Zeta function (has to be &gt;0)
- * @returns Zeta(s)
- */
-function zeta(s) {
-  let z=0;
-  let n=1;
-  const minusS=-s;
-  if (s<1.8) {
-    while (n<5_000_000) {
-      z+=Math.pow(n,minusS);
-      n++;
-    }
-  } else {
-    while (n<5_000_000) {
-		  const add=Math.pow(n,minusS);
-      z+=add;
-      if (add<1E-12) break;
-      n++;
-    }
-  }
-  return z;
-}
 
 
 let polarSpare;
@@ -303,7 +279,7 @@ class DiscreteProbabilityDistribution extends ContinuousProbabilityDistribution 
  */
 class DiscreteUniformDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("discreteuniform");
+    super("discreteuniform",language.expressionBuilder.stochastics.distribution.discreteUniform);
     this._addDiscreteParameter("a",null);
     this._addDiscreteParameter("b",null);
   }
@@ -323,7 +299,7 @@ class DiscreteUniformDistribution extends DiscreteProbabilityDistribution {
  */
 class HypergeometricDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("hypergeom");
+    super("hypergeom",language.expressionBuilder.stochastics.distribution.hypergeometric);
     this._addDiscreteParameter("N",1);
     this._addDiscreteParameter("R",0);
     this._addDiscreteParameter("n",1);
@@ -346,7 +322,7 @@ class HypergeometricDistribution extends DiscreteProbabilityDistribution {
  */
 class BinomialDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("binomial");
+    super("binomial",language.expressionBuilder.stochastics.distribution.binomial);
     this._addDiscreteParameter("n",1);
     this._addContinuousParameter("p",0,true,1,true);
   }
@@ -363,7 +339,7 @@ class BinomialDistribution extends DiscreteProbabilityDistribution {
  */
 class PoissonDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("poisson");
+    super("poisson",language.expressionBuilder.stochastics.distribution.poisson);
     this._addContinuousParameter("lambda",0,false,null,false);
   }
 
@@ -382,7 +358,7 @@ class PoissonDistribution extends DiscreteProbabilityDistribution {
  */
 class GeometricDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("geometric");
+    super("geometric",language.expressionBuilder.stochastics.distribution.geometric);
     this._addContinuousParameter("p",0,true,1,true);
   }
 
@@ -398,7 +374,7 @@ class GeometricDistribution extends DiscreteProbabilityDistribution {
  */
 class NegativeHypergeometricDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("negativehypergeom");
+    super("negativehypergeom",language.expressionBuilder.stochastics.distribution.negativeHypergeometric);
     this._addDiscreteParameter("N",1);
     this._addDiscreteParameter("R",1);
     this._addDiscreteParameter("n",1);
@@ -424,7 +400,7 @@ class NegativeHypergeometricDistribution extends DiscreteProbabilityDistribution
  */
 class NegativeBinomialDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("negativebinomial");
+    super("negativebinomial",language.expressionBuilder.stochastics.distribution.negativeBinomial);
     this._addDiscreteParameter("r",1);
     this._addContinuousParameter("p",0,true,1,true);
   }
@@ -443,14 +419,14 @@ class ZetaDistribution extends DiscreteProbabilityDistribution {
   #lastZeta;
 
   constructor() {
-    super("zeta");
+    super("zeta",language.expressionBuilder.stochastics.distribution.zeta);
     this._addDiscreteParameter("s",1);
   }
 
   _getPDF(values, k) {
     if (k<=0) return 0;
     const s=values.s;
-    const z=(s==this.#lastS)?this.#lastZeta:zeta(s);
+    const z=(s==this.#lastS)?this.#lastZeta:math.zeta(s);
     this.#lastS=s;
     this.#lastZeta=z;
     return 1/(k**s)/z;
@@ -463,7 +439,7 @@ class ZetaDistribution extends DiscreteProbabilityDistribution {
  */
 class RademacherDistribution extends DiscreteProbabilityDistribution {
   constructor() {
-    super("rademacher");
+    super("rademacher",language.expressionBuilder.stochastics.distribution.rademacher);
   }
 
   _getPDF(values, k) {
@@ -486,7 +462,7 @@ class RademacherDistribution extends DiscreteProbabilityDistribution {
  */
 class UniformDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("uniform");
+    super("uniform",language.expressionBuilder.stochastics.distribution.uniform);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
   }
@@ -519,7 +495,7 @@ class UniformDistribution extends ContinuousProbabilityDistribution {
  */
 class ExponentialDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("exp");
+    super("exp",language.expressionBuilder.stochastics.distribution.exponential);
     this._addContinuousParameter("lambda",0,false,null,false);
   }
 
@@ -544,7 +520,7 @@ class ExponentialDistribution extends ContinuousProbabilityDistribution {
  */
 class NormalDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("normal");
+    super("normal",language.expressionBuilder.stochastics.distribution.normal);
     this._addContinuousParameter("mu",null,false,null,false);
     this._addContinuousParameter("sigma",0,true,null,false);
   }
@@ -570,7 +546,7 @@ class NormalDistribution extends ContinuousProbabilityDistribution {
  */
 class LogNormalDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("lognormal");
+    super("lognormal",language.expressionBuilder.stochastics.distribution.logNormal);
     this._addContinuousParameter("mean",0,false,null,false);
     this._addContinuousParameter("std",0,true,null,false);
   }
@@ -622,7 +598,7 @@ class LogNormalDistribution extends ContinuousProbabilityDistribution {
  */
 class ArcsineDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("arcsine");
+    super("arcsine",language.expressionBuilder.stochastics.distribution.arcsine);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
   }
@@ -658,7 +634,7 @@ class ArcsineDistribution extends ContinuousProbabilityDistribution {
  */
 class BetaDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("beta");
+    super("beta",language.expressionBuilder.stochastics.distribution.beta);
     this._addContinuousParameter("alpha",0,false,null,false);
     this._addContinuousParameter("beta",0,false,null,false);
     this._addContinuousParameter("a",null,false,null,false);
@@ -703,7 +679,7 @@ class BetaDistribution extends ContinuousProbabilityDistribution {
  */
 class CauchyDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("cauchy");
+    super("cauchy",language.expressionBuilder.stochastics.distribution.cauchy);
     this._addContinuousParameter("t",null,false,null,false);
     this._addContinuousParameter("s",0,false,null,false);
   }
@@ -729,7 +705,7 @@ class CauchyDistribution extends ContinuousProbabilityDistribution {
  */
 class ChiDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("chi");
+    super("chi",language.expressionBuilder.stochastics.distribution.chi);
     this._addDiscreteParameter("k",1);
   }
 
@@ -752,7 +728,7 @@ class ChiDistribution extends ContinuousProbabilityDistribution {
  */
 class Chi2Distribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("chisquared");
+    super("chisquared",language.expressionBuilder.stochastics.distribution.chiSquared);
     this._addDiscreteParameter("k",1);
   }
 
@@ -775,7 +751,7 @@ class Chi2Distribution extends ContinuousProbabilityDistribution {
  */
 class ErlangDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("erlang");
+    super("erlang",language.expressionBuilder.stochastics.distribution.erlang);
     this._addDiscreteParameter("n",1);
     this._addContinuousParameter("lambda",0,false,null,false);
   }
@@ -799,7 +775,7 @@ class ErlangDistribution extends ContinuousProbabilityDistribution {
  */
 class FDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("f");
+    super("f",language.expressionBuilder.stochastics.distribution.f);
     this._addContinuousParameter("m",0,false,null,false);
     this._addContinuousParameter("n",0,false,null,false);
   }
@@ -822,7 +798,7 @@ class FDistribution extends ContinuousProbabilityDistribution {
  */
 class GammaDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("gamma");
+    super("gamma",language.expressionBuilder.stochastics.distribution.gamma);
     this._addContinuousParameter("alpha",0,false,null,false);
     this._addContinuousParameter("beta",0,false,null,false);
   }
@@ -854,7 +830,7 @@ class GumbelDistribution extends ContinuousProbabilityDistribution {
   #betaFactor;
 
   constructor() {
-    super("gumbel");
+    super("gumbel",language.expressionBuilder.stochastics.distribution.gumbel);
     this.#euler=Math.PI/(2*Math.E);
     this.#betaFactor=Math.sqrt(6)/Math.PI;
     this._addContinuousParameter("mean",null,false,null,false);
@@ -901,7 +877,7 @@ class GumbelDistribution extends ContinuousProbabilityDistribution {
  */
 class HalfNormalDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("halfnormal");
+    super("halfnormal",language.expressionBuilder.stochastics.distribution.halfNormal);
     this._addContinuousParameter("s",null,false,null,false);
     this._addContinuousParameter("mu",0,false,null,false);
   }
@@ -930,7 +906,7 @@ class HalfNormalDistribution extends ContinuousProbabilityDistribution {
  */
 class HyperbolicSecantDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("hyperbolicsecant");
+    super("hyperbolicsecant",language.expressionBuilder.stochastics.distribution.hyperbolicSecant);
     this._addContinuousParameter("mu",null,false,null,false);
     this._addContinuousParameter("sigma",0,false,null,false);
   }
@@ -968,7 +944,7 @@ class HyperbolicSecantDistribution extends ContinuousProbabilityDistribution {
  */
 class InverseGaussianDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("inversegaussian")
+    super("inversegaussian",language.expressionBuilder.stochastics.distribution.inverseGaussian)
     this._addContinuousParameter("lambda",0,false,null,false);
     this._addContinuousParameter("mu",0,false,null,false);
   }
@@ -994,7 +970,7 @@ class InverseGaussianDistribution extends ContinuousProbabilityDistribution {
  */
 class IrwinHallDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("irwinhall");
+    super("irwinhall",language.expressionBuilder.stochastics.distribution.irwinHall);
     this._addDiscreteParameterMinMax("n",1,25);
   }
 
@@ -1033,7 +1009,7 @@ class IrwinHallDistribution extends ContinuousProbabilityDistribution {
  */
 class JohnsonSUDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("johnsonsu");
+    super("johnsonsu",language.expressionBuilder.stochastics.distribution.johnsonSU);
     this._addContinuousParameter("gamma",0,false,null,false);
     this._addContinuousParameter("xi",0,false,null,false);
     this._addContinuousParameter("delta",0,false,null,false);
@@ -1069,7 +1045,7 @@ class JohnsonSUDistribution extends ContinuousProbabilityDistribution {
  */
 class KumaraswamyDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("kumaraswamy");
+    super("kumaraswamy",language.expressionBuilder.stochastics.distribution.kumaraswamy);
     this._addContinuousParameter("a",0,false,null,false);
     this._addContinuousParameter("b",0,false,null,false);
   }
@@ -1094,7 +1070,7 @@ class KumaraswamyDistribution extends ContinuousProbabilityDistribution {
  */
 class LaplaceDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("laplace");
+    super("laplace",language.expressionBuilder.stochastics.distribution.laplace);
     this._addContinuousParameter("mu",null,false,null,false);
     this._addContinuousParameter("sigma",0,false,null,false);
   }
@@ -1120,7 +1096,7 @@ class LaplaceDistribution extends ContinuousProbabilityDistribution {
  */
 class LevyDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("levy");
+    super("levy",language.expressionBuilder.stochastics.distribution.levy);
     this._addContinuousParameter("mu",null,false,null,false);
     this._addContinuousParameter("gamma",0,false,null,false);
   }
@@ -1147,7 +1123,7 @@ class LevyDistribution extends ContinuousProbabilityDistribution {
  */
 class LogisticDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("logistic");
+    super("logistic",language.expressionBuilder.stochastics.distribution.logistic);
     this._addContinuousParameter("mu",null,false,null,false);
     this._addContinuousParameter("s",0,false,null,false);
   }
@@ -1178,7 +1154,7 @@ class LogisticDistribution extends ContinuousProbabilityDistribution {
  */
 class LogLogisticDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("loglogistic");
+    super("loglogistic",language.expressionBuilder.stochastics.distribution.logLogistic);
     this._addContinuousParameter("alpha",0,false,null,false);
     this._addContinuousParameter("beta",0,false,null,false);
   }
@@ -1208,7 +1184,7 @@ class LogLogisticDistribution extends ContinuousProbabilityDistribution {
  */
 class MaxwellBoltzmannDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("maxwellboltzmann");
+    super("maxwellboltzmann",language.expressionBuilder.stochastics.distribution.maxwellBoltzmann);
     this._addContinuousParameter("a",0,false,null,false);
   }
 
@@ -1237,7 +1213,7 @@ class MaxwellBoltzmannDistribution extends ContinuousProbabilityDistribution {
  */
 class ParetoDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("pareto");
+    super("pareto",language.expressionBuilder.stochastics.distribution.pareto);
     this._addContinuousParameter("xm",0,false,null,false);
     this._addContinuousParameter("alpha",0,false,null,false);
   }
@@ -1265,7 +1241,7 @@ class ParetoDistribution extends ContinuousProbabilityDistribution {
  */
 class PertDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("pert");
+    super("pert",language.expressionBuilder.stochastics.distribution.pert);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
     this._addContinuousParameter("c",null,false,null,false);
@@ -1308,7 +1284,7 @@ class PertDistribution extends ContinuousProbabilityDistribution {
 class ReciprocalDistribution extends ContinuousProbabilityDistribution {
 
   constructor() {
-    super("reciprocal");
+    super("reciprocal",language.expressionBuilder.stochastics.distribution.reciprocal);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
   }
@@ -1349,7 +1325,7 @@ class ReciprocalDistribution extends ContinuousProbabilityDistribution {
  */
 class SineDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("sine");
+    super("sine",language.expressionBuilder.stochastics.distribution.sine);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
   }
@@ -1385,7 +1361,7 @@ class SineDistribution extends ContinuousProbabilityDistribution {
  */
 class StudentTDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("studentt");
+    super("studentt",language.expressionBuilder.stochastics.distribution.studentT);
     this._addContinuousParameter("nu",0,false,null,false);
     this._addContinuousParameter("mu",null,false,null,false);
   }
@@ -1414,7 +1390,7 @@ class StudentTDistribution extends ContinuousProbabilityDistribution {
  */
 class TrapezoidDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("trapezoid");
+    super("trapezoid",language.expressionBuilder.stochastics.distribution.trapezoid);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
     this._addContinuousParameter("c",null,false,null,false);
@@ -1483,7 +1459,7 @@ class TrapezoidDistribution extends ContinuousProbabilityDistribution {
  */
 class TriangularDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("triangular");
+    super("triangular",language.expressionBuilder.stochastics.distribution.triangular);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("c",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
@@ -1546,7 +1522,7 @@ class TriangularDistribution extends ContinuousProbabilityDistribution {
  */
 class UQuadraticDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("uquadratic");
+    super("uquadratic",language.expressionBuilder.stochastics.distribution.uQuadratic);
     this._addContinuousParameter("a",null,false,null,false);
     this._addContinuousParameter("b",null,false,null,false);
   }
@@ -1599,7 +1575,7 @@ class UQuadraticDistribution extends ContinuousProbabilityDistribution {
  */
 class WeibullDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("weibull");
+    super("weibull",language.expressionBuilder.stochastics.distribution.weibull);
     this._addContinuousParameter("beta",0,false,null,false);
     this._addContinuousParameter("lambda",0,false,null,false);
   }
@@ -1627,7 +1603,7 @@ class WeibullDistribution extends ContinuousProbabilityDistribution {
  */
 class WignerSemicircleDistribution extends ContinuousProbabilityDistribution {
   constructor() {
-    super("wignersemicircle");
+    super("wignersemicircle",language.expressionBuilder.stochastics.distribution.wignerSemicircle);
     this._addContinuousParameter("m",null,false,null,false);
     this._addContinuousParameter("R",0,false,null,false);
   }
@@ -1659,62 +1635,69 @@ class WignerSemicircleDistribution extends ContinuousProbabilityDistribution {
 /**
  * Array of all available distribution objects
  */
-const distributions=[
-  /* Discrete distributions */
-  new DiscreteUniformDistribution(),
-  new HypergeometricDistribution(),
-  new BinomialDistribution(),
-  new PoissonDistribution(),
-  new GeometricDistribution(),
-  new NegativeHypergeometricDistribution(),
-  new NegativeBinomialDistribution(),
-  new ZetaDistribution(),
-  new RademacherDistribution(),
+let distributions=null;
 
-  /* Continuous distributions */
-  new UniformDistribution(),
-  new ExponentialDistribution(),
-  new NormalDistribution(),
-  new LogNormalDistribution(),
-  new ArcsineDistribution(),
-  new BetaDistribution(),
-  new CauchyDistribution(),
-  new ChiDistribution(),
-  new Chi2Distribution(),
-  new ErlangDistribution(),
-  new FDistribution(),
-  new GammaDistribution(),
-  new GumbelDistribution(),
-  new HalfNormalDistribution(),
-  new HyperbolicSecantDistribution(),
-  new InverseGaussianDistribution(),
-  new IrwinHallDistribution(),
-  new JohnsonSUDistribution(),
-  new KumaraswamyDistribution(),
-  new LaplaceDistribution(),
-  new LevyDistribution(),
-  new LogisticDistribution(),
-  new LogLogisticDistribution(),
-  new MaxwellBoltzmannDistribution(),
-  new ParetoDistribution(),
-  new PertDistribution(),
-  new ReciprocalDistribution(),
-  new SineDistribution(),
-  new StudentTDistribution(),
-  new TrapezoidDistribution(),
-  new TriangularDistribution(),
-  new UQuadraticDistribution(),
-  new WeibullDistribution(),
-  new WignerSemicircleDistribution()
-];
+function getDistributions() {
+  if (distributions==null) distributions=[
+    /* Discrete distributions */
+    new DiscreteUniformDistribution(),
+    new HypergeometricDistribution(),
+    new BinomialDistribution(),
+    new PoissonDistribution(),
+    new GeometricDistribution(),
+    new NegativeHypergeometricDistribution(),
+    new NegativeBinomialDistribution(),
+    new ZetaDistribution(),
+    new RademacherDistribution(),
+
+    /* Continuous distributions */
+    new UniformDistribution(),
+    new ExponentialDistribution(),
+    new NormalDistribution(),
+    new LogNormalDistribution(),
+    new ArcsineDistribution(),
+    new BetaDistribution(),
+    new CauchyDistribution(),
+    new ChiDistribution(),
+    new Chi2Distribution(),
+    new ErlangDistribution(),
+    new FDistribution(),
+    new GammaDistribution(),
+    new GumbelDistribution(),
+    new HalfNormalDistribution(),
+    new HyperbolicSecantDistribution(),
+    new InverseGaussianDistribution(),
+    new IrwinHallDistribution(),
+    new JohnsonSUDistribution(),
+    new KumaraswamyDistribution(),
+    new LaplaceDistribution(),
+    new LevyDistribution(),
+    new LogisticDistribution(),
+    new LogLogisticDistribution(),
+    new MaxwellBoltzmannDistribution(),
+    new ParetoDistribution(),
+    new PertDistribution(),
+    new ReciprocalDistribution(),
+    new SineDistribution(),
+    new StudentTDistribution(),
+    new TrapezoidDistribution(),
+    new TriangularDistribution(),
+    new UQuadraticDistribution(),
+    new WeibullDistribution(),
+    new WignerSemicircleDistribution()
+  ];
+
+  return distributions;
+}
+
 
 /**
  * Loads the probability distributions as MathJS extensions.
  */
 function loadMathJSDistributionExtensions() {
-  if (!math || !math.import) {setTimeout(loadMathJSDistributionExtensions,100); return;}
+  if (typeof(math)=='undefined' || !math.import) {setTimeout(loadMathJSDistributionExtensions,100); return;}
 
   const importFunctions={};
-  distributions.forEach(distribution=>distribution.getFunctions(importFunctions));
+  getDistributions().forEach(distribution=>distribution.getFunctions(importFunctions));
   math.import(importFunctions);
 }

@@ -27,9 +27,6 @@ import {loadMathJSDistributionExtensions} from './MathJSDistributionTools.js';
 import {language} from './Language.js';
 
 
-loadMathJSExtensions();
-loadMathJSDistributionExtensions();
-
 
 /**
  * Calculator panel
@@ -50,15 +47,56 @@ class CalcPanel extends Panel {
   constructor() {
     super();
 
-    let div;
+    loadMathJSExtensions();
+    loadMathJSDistributionExtensions();
 
-    /* Input / output lines */
+    let div;
+    let button;
+    let tr, td;
+
+    /* Input line */
     div=this.#createLine();
-    this.#editInput=this._createInput(div,false,language.calc.input);
+    tr=this.#createTable(div);
+    tr.appendChild(td=document.createElement("td"));
+    this.#editInput=this._createInput(td,false,language.calc.input);
+    tr.appendChild(td=document.createElement("td"));
+    td.style.width="1px";
+    button=this.#createButton(td,"",language.calc.ExpressionBuilder,"primary",()=>{
+      if (isDesktopApp) {
+        Neutralino.storage.setData('selectSymbol',null).then(()=>{
+          Neutralino.storage.setData('returnID','0').then(()=>window.open("info_webapp.html"));
+        });
+      } else {
+        const popup=window.open("info.html");
+        setTimeout(()=>popup.postMessage("0"),1500);
+      }
+    });
+    if (isDesktopApp) setInterval(()=>{
+        Neutralino.storage.getData('selectSymbol').then(data=>{
+          Neutralino.storage.setData('selectSymbol',null);
+          this.#insertSymbol(data);
+        }).catch(()=>{});
+      },250);
+
+    window.addEventListener("message",event=>this.#insertSymbol(event.data));
+    button.classList.add("bi-code");
+    button.style.marginLeft="5px";
+
     div=this.#createLine();
     this.#errorInfo=this._createDiv(div);
+
+    /* Output line */
     div=this.#createLine();
-    this.#editOutput=this._createInput(div,true,language.calc.output);
+    tr=this.#createTable(div);
+    tr.appendChild(td=document.createElement("td"));
+    this.#editOutput=this._createInput(td,true,language.calc.output);
+    tr.appendChild(td=document.createElement("td"));
+    td.style.width="1px";
+    button=this.#createButton(td,"",language.calc.copy,"primary",()=>navigator.clipboard.writeText(this.#editOutput.value));
+    button.classList.add("bi-clipboard");
+    button.style.marginLeft="5px";
+
+    /* Clear button */
     div=this.#createLine();
     this.#createButton(div,"C",language.calc.C,"danger",()=>{this.#editInput.value=''; this.#calc();})
     this.#createButton(div,"<span class='bi-arrow-right'></span>&nbsp;M",language.calc.M,"success",()=>{this.#panelMemory.save(this.#editOutput.value); if (this.#currentSubPanel!=0) this.#showSubPanel(0);});
@@ -82,6 +120,15 @@ class CalcPanel extends Panel {
     setTimeout(()=>setMinHeight(this._panel.scrollHeight,true),500);
   }
 
+  #insertSymbol(jsonString) {
+    const json=JSON.parse(jsonString);
+    if (json.ID!=0) return;
+    const str=this.#editInput.value;
+    const caret=this.#editInput.selectionStart;
+    this.#editInput.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+    this.#calc();
+  }
+
   #insertInInput(text) {
     const selStart=this.#editInput.selectionStart;
     const oldValue=this.#editInput.value;
@@ -100,6 +147,15 @@ class CalcPanel extends Panel {
     const line=this._createDiv(this._panel);
     line.style.padding="5px";
     return line;
+  }
+
+  #createTable(parent) {
+    const table=document.createElement("table");
+    table.style.width="100%";
+    parent.appendChild(table);
+    const tr=document.createElement("tr");
+    table.appendChild(tr);
+    return tr;
   }
 
   #createButton(parent, text, tooltip, color, onclick) {

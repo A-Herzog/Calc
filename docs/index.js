@@ -67,5 +67,5 @@ if (typeof(infoLoading)!='undefined') infoLoading.style.display="none";
 /* Calculate size for window */
 setTimeout(()=>{
   initSizeCalculation();
-  setMinWidth(1000,mainContent.scrollHeight);
+  setMinWidth(1000);
 },0);

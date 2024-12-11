@@ -17,6 +17,8 @@ limitations under the License.
 export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
 
 import {formatNumber} from './NumberTools.js';
+import {betafn, lowRegGamma} from '../libs/jstat-special.js';
+import {factorize, collectFactors, getPhi} from './PanelPrimeFactorsPanel.js';
 
 /* Math JS extensions */
 
@@ -151,10 +153,130 @@ function integrate(...params) {
 }
 
 /**
+ * Truncated the fraction part of the number.
+ * @param {number} num Number
+ * @returns Truncated number
+ */
+function trunc(num) {
+  return (num>0)?Math.floor(num):Math.ceil(num);
+}
+
+/**
+ * Integer part of the number.
+ * @param {number} num Number
+ * @returns Integer part of the number
+ */
+function roundInt(num) {
+  return trunc(num);
+}
+
+/**
+ * Fraction part of the number.
+ * @param {number} num Number
+ * @returns Fraction part of the number
+ */
+function frac(num) {
+  return num-roundInt(num);
+}
+
+/**
+ * Calculates the coefficient of variations of sample values.
+ * @param  {...number} params Sample values
+ * @returns Coefficient of variation
+ */
+function cv(...params) {
+  const std=math.std(...params);
+  const mean=math.mean(...params);
+  if (mean==0) return Number.POSITIVE_INFINITY;
+  return std/Math.abs(mean);
+}
+
+/**
+ * Calculates the squared coefficient of variations of sample values.
+ * @param  {...number} params Sample values
+ * @returns Squared coefficient of variation
+ */
+function scv(...params) {
+  const cvValue=cv(...params);
+  return cvValue**2;
+}
+
+/**
+ * Calculates the skewness of sample values.
+ * @param  {...number} params Sample values
+ * @returns Skewness
+ */
+function skewness(...params) {
+  const n=params.length;
+  const squaredSum=params.map(x=>x**2).reduce((a,b)=>a+b);
+  const cubicSum=params.map(x=>x**3).reduce((a,b)=>a+b);
+  const mean=math.mean(params);
+  const std=math.std(params);
+  if (n<3 || std==0.0) return 0;
+  /* see https://en.wikipedia.org/wiki/Skewness */
+  return n/(n-1)/(n-2)/Math.pow(std,3)*(cubicSum-3*mean*squaredSum+2*n*Math.pow(mean,3));
+}
+
+/**
+ * Calculates the kurtosis of sample values.
+ * @param  {...number} params Sample values
+ * @returns Kurtosis
+ */
+function kurtosis(...params) {
+  const n=params.length;
+  const squaredSum=params.map(x=>x**2).reduce((a,b)=>a+b);
+  const cubicSum=params.map(x=>x**3).reduce((a,b)=>a+b);
+  const quarticSum=params.map(x=>x**4).reduce((a,b)=>a+b);
+  const mean=math.mean(params);
+  const std=math.std(params);
+  if (n<4 || std==0.0) return 0;
+  /* siehe: https://en.wikipedia.org/wiki/Kurtosis */
+  const normDistComparision=3*Math.pow(n-1,2)/(n-2)/(n-3);
+  return n*(n+1)/(n-1)/(n-2)/(n-3)/Math.pow(std,4)*(quarticSum-4*mean*cubicSum+6*Math.pow(mean,2)*squaredSum-3*n*Math.pow(mean,4))-normDistComparision;
+}
+
+
+/**
+ * Calculates the geometric mean of sample values.
+ * @param  {...number} params Sample values
+ * @returns Geometric mean
+ */
+function geomean(...params) {
+  if (params.filter(x<=0).length>0) return Number.NaN;
+  const n=params.length;
+  const prod=params.reduce((a,b)=>a*b,1);
+  return Math.pow(prod,1/n);
+}
+
+/**
+ * Calculates the harmonic mean of sample values.
+ * @param  {...number} params Sample values
+ * @returns Harmonic mean
+ */
+function harmonicmean(...params) {
+  const n=params.length;
+  if (params.filter(x=>x==0).length>0) return Number.NaN;
+  const sumInv=params.map(x=>1/x).reduce((a,b)=>a+b);
+  return n/sumInv;
+}
+
+/**
+ * Calculates Eulers phi function value for the given numer.
+ * @param {number} num Number for which phi is to be calculated
+ * @returns Eulers phi number
+ */
+function eulerphi(num) {
+  if (typeof(num)!='number') return Number.NaN;
+  const factors=factorize(BigInt(Math.round(num)));
+  const collectedFactors=collectFactors(factors);
+  return getPhi(collectedFactors);
+}
+
+/**
  * Loads the MathJS extensions
  */
 function loadMathJSExtensions() {
-  if (!math || !math.import) {setTimeout(loadMathExtensions,100); return;}
+  if (typeof(math)=='undefined' || !math.import) {setTimeout(loadMathJSExtensions,100); return;}
   math.import({
     sqr: param=>param*param,
     ln: param=>math.log(param),
@@ -167,6 +289,19 @@ function loadMathJSExtensions() {
     sumx: sumX,
     prodx: prodX,
     integrate: integrate,
+    trunc: trunc,
+    int: roundInt,
+    frac: frac,
+    beta: betafn,
+    lowerRegGamma: lowRegGamma, /* P(a,x) */
+    upperRegGamma: (a,x)=>1-lowRegGamma(a,x), /* Q(a,x)=1-P(a,x) */
+    cv: cv,
+    scv: scv,
+    geomean: geomean,
+    harmonicmean: harmonicmean,
+    skewness: skewness,
+    kurtosis: kurtosis,
+    eulerphi: eulerphi
   });
 }
 

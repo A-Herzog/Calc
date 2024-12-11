@@ -124,11 +124,13 @@ class PlotPanel extends Panel {
 
     /* Functions */
     const table=document.createElement("table");
+    table.style.width="100%";
     this._panel.appendChild(table);
+    let index=0;
     for (let graph of this.#graphData) {
       const tr=document.createElement("tr");
       table.appendChild(tr);
-      const nodes=this.#generateInputElements(graph.name+':=',graph.color,450,graph.text);
+      const nodes=this.#generateInputElements(graph.name+':=',graph.color,null,graph.text);
       const tdLeft=document.createElement("td");
       tr.appendChild(tdLeft);
       tdLeft.appendChild(nodes.label);
@@ -138,16 +140,48 @@ class PlotPanel extends Panel {
       nodes.input.oninput=()=>this.#updateChart();
       this.#inputGraph.push(nodes.input);
       const tdRight=document.createElement("td");
+      tdRight.style.width="100px";
+
       tr.appendChild(tdRight);
-      const button=document.createElement("button");
-      tdRight.appendChild(button);
+      let button;
+      const input=nodes.input;
+
+      /* Delete button */
+      tdRight.appendChild(button=document.createElement("button"));
       button.type="button";
       button.className="btn btn-danger btn-sm bi bi-trash";
       button.title=language.plot.clearInput;
       button.style.marginLeft="5px";
-      const input=nodes.input;
       button.onclick=()=>{input.value=""; this.#updateChart();};
+
+      /* Expression build button */
+      tdRight.appendChild(button=document.createElement("button"));
+      button.type="button";
+      button.className="btn btn-primary btn-sm bi bi-code";
+      button.title=language.calc.ExpressionBuilder;
+      button.style.marginLeft="5px";
+      const currentIndex=index;
+      button.onclick=()=>{
+        if (isDesktopApp) {
+          Neutralino.storage.setData('selectSymbol',null).then(()=>{
+            Neutralino.storage.setData('returnID',''+(currentIndex+1)).then(()=>window.open("info_webapp.html"));
+          });
+        } else {
+          const popup=window.open("info.html");
+          setTimeout(()=>popup.postMessage(currentIndex+1),1500);
+        }
+      };
+      index++;
     }
+
+    if (isDesktopApp) setInterval(()=>{
+      Neutralino.storage.getData('selectSymbol').then(data=>{
+        Neutralino.storage.setData('selectSymbol',null);
+        this.#insertSymbol(data);
+      }).catch(()=>{});
+    },250);
+
+    window.addEventListener("message",event=>this.#insertSymbol(event.data));
 
     /* Additional parameter */
     this._panel.appendChild(line=document.createElement("div"));
@@ -176,6 +210,16 @@ class PlotPanel extends Panel {
     this.#updateChart();
   }
 
+  #insertSymbol(jsonString) {
+    const json=JSON.parse(jsonString);
+    if (json.ID<1 || json.ID>this.#inputGraph.length) return;
+    const input=this.#inputGraph[json.ID-1];
+    const str=input.value;
+    const caret=input.selectionStart;
+    input.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+    this.#updateChart();
+  }
+
   #generateInputElements(labelText, labelColor, width, value) {
     const label=document.createElement("label");
         label.className="form-label";
@@ -186,8 +230,10 @@ class PlotPanel extends Panel {
     input.type="text";
     input.spellcheck=false;
     input.className="form-control";
-    input.style.display="inline-block";
-    input.style.width=width+"px";
+    if (width) {
+      input.style.display="inline-block";
+      input.style.width=width+"px";
+    }
     input.value=value;
 
     label.htmlFor=input;
