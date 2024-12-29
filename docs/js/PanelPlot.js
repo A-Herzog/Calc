@@ -47,6 +47,7 @@ class PlotPanel extends Panel {
   #rangeT;
   #inputGraph=[];
   #tableData="";
+  #axisCenter=false;
 
   constructor() {
     super();
@@ -67,7 +68,7 @@ class PlotPanel extends Panel {
       options: this.#getChartOptions()
     });
 
-    /* Zoom info & reset button & export buttons */
+    /* Zoom info line */
     const canvasInfo=document.createElement("div");
     this._panel.appendChild(canvasInfo);
     canvasInfo.className="mt-3";
@@ -75,23 +76,20 @@ class PlotPanel extends Panel {
     canvasInfo.appendChild(span);
     span.className="small";
     span.innerHTML=language.plot.zoomInfo;
-    canvasInfo.appendChild(button=document.createElement("button"));
-    button.type="button";
-    button.className="btn btn-warning btn-sm bi-zoom-out";
-    button.innerHTML=" "+language.plot.resetZoom;
-    button.onclick=()=>{
+
+    /* Buttons line */
+
+    /* Reset zoom button */
+    this.#addButton(canvasInfo,"zoom-out","warning",language.plot.resetZoom,language.plot.resetZoomHint,()=>{
       this.#inputXMin.value="-10";
       this.#inputXMax.value="10";
       this.#inputYMin.value="-10";
       this.#inputYMax.value="10";
       this.#updateChart();
-    }
-    canvasInfo.appendChild(button=document.createElement("button"));
-    button.type="button";
-    button.className="btn btn-warning btn-sm bi-aspect-ratio";
-    button.style.marginLeft="10px";
-    button.innerHTML=" "+language.plot.resetZoomAspectRatio;
-    button.onclick=()=>{
+    });
+
+    /* Aspect ratio button */
+    this.#addButton(canvasInfo,"aspect-ratio","warning",language.plot.resetZoomAspectRatio,language.plot.resetZoomAspectRatioHint,()=>{
       const ratio=this.#canvas.width/this.#canvas.height;
       const xMin=getFloat(this.#inputXMin.value);
       const xMax=getFloat(this.#inputXMax.value);
@@ -103,9 +101,47 @@ class PlotPanel extends Panel {
       this.#inputYMin.value=formatNumber(yMiddle-xRange/ratio/2);
       this.#inputYMax.value=formatNumber(yMiddle+xRange/ratio/2);
       this.#updateChart();
-    }
-    this.#addExportButton(canvasInfo,"clipboard",language.GUI.copy,language.GUI.copyDiagramTable,language.GUI.copyDiagramImage,()=>this.#copyTable(),()=>this.#copyChart());
-    this.#addExportButton(canvasInfo,"download",language.GUI.save,language.GUI.saveDiagramTable,language.GUI.saveDiagramImage,()=>this.#saveTable(),()=>this.#saveChart());
+    });
+
+    /* Size button */
+    this.#addMenuButton(canvasInfo,"arrows-fullscreen","warning",language.plot.size,[
+      language.plot.sizeFull,
+      "-",
+      language.plot.sizeLarge,
+      language.plot.sizeMedium,
+      language.plot.sizeSmall
+    ],[
+      ()=>this.#setSize(0),
+      null,
+      ()=>this.#setSize(3),
+      ()=>this.#setSize(2),
+      ()=>this.#setSize(1)
+    ]);
+
+    /* Axis position */
+    this.#addButton(canvasInfo,"border","warning",language.plot.axis,language.plot.axisHint,()=>{
+      if (this.#axisCenter) {
+        this.#chart.options.scales.x.position = 'bottom';
+        this.#chart.options.scales.y.position = 'left';
+      } else {
+        this.#chart.options.scales.x.position = 'center';
+        this.#chart.options.scales.y.position = 'center';
+      }
+      this.#chart.update();
+      this.#axisCenter=!this.#axisCenter;
+    });
+
+    /* Copy button */
+    this.#addMenuButton(canvasInfo,"clipboard","primary",language.GUI.copy,[language.GUI.copyDiagramTable,language.GUI.copyDiagramImage],[()=>this.#copyTable(),()=>this.#copyChart()]);
+
+    /* Save button */
+    this.#addMenuButton(canvasInfo,"download","primary",language.GUI.save,[language.GUI.saveDiagramTable,language.GUI.saveDiagramImage],[()=>this.#saveTable(),()=>this.#saveChart()]);
+
+    /* Delete all button */
+    this.#addButton(canvasInfo,"trash","danger",language.plot.clearInputAll,language.plot.clearInputAllHint,()=>{
+      this.#inputGraph.forEach(input=>input.value="");
+      this.#updateChart();
+    });
 
     /* Axis setup */
     this._panel.appendChild(line=document.createElement("div"));
@@ -133,6 +169,7 @@ class PlotPanel extends Panel {
       const nodes=this.#generateInputElements(graph.name+':=',graph.color,null,graph.text);
       const tdLeft=document.createElement("td");
       tr.appendChild(tdLeft);
+      tdLeft.style.width="60px";
       tdLeft.appendChild(nodes.label);
       const tdCenter=document.createElement("td");
       tr.appendChild(tdCenter);
@@ -248,16 +285,27 @@ class PlotPanel extends Panel {
     return nodes.input;
   }
 
-  #addExportButton(parent, icon, text, subText1, subText2, subAction1, subAction2) {
+  #addButton(parent, icon, color, text, hint, action) {
+    const button=document.createElement("button");
+    parent.appendChild(button);
+    button.type="button";
+    button.className="btn btn-"+color+" btn-sm bi-"+icon;
+    button.style.marginRight="10px";
+    button.innerHTML=" "+text;
+    button.title=hint;
+    button.onclick=action;
+  }
+
+  #addMenuButton(parent, icon, color, text, subText, subAction) {
     const div=document.createElement("div");
     parent.appendChild(div);
     div.class="dropdown";
     div.style.display="inline-block";
-    div.style.marginLeft="10px";
+    div.style.marginRight="10px";
 
     const button=document.createElement("button");
     div.appendChild(button);
-    button.className="btn btn-primary btn-sm bi-"+icon+" dropdown-toggle my-1";
+    button.className="btn btn-"+color+" btn-sm bi-"+icon+" dropdown-toggle my-1";
     button.type="button";
     button.dataset.bsToggle="dropdown";
     button.innerHTML=" "+text;
@@ -266,21 +314,22 @@ class PlotPanel extends Panel {
     div.appendChild(ul);
     ul.className="dropdown-menu";
 
-    let li, a;
-
-    ul.appendChild(li=document.createElement("li"));
-    li.appendChild(a=document.createElement("a"));
-    a.className="dropdown-item";
-    a.style.cursor="pointer";
-    a.onclick=subAction1;
-    a.innerHTML=subText1;
-
-    ul.appendChild(li=document.createElement("li"));
-    li.appendChild(a=document.createElement("a"));
-    a.className="dropdown-item";
-    a.style.cursor="pointer";
-    a.onclick=subAction2;
-    a.innerHTML=subText2;
+    for (let i=0;i<Math.min(subText.length,subAction.length);i++) {
+      const li=document.createElement("li");
+      ul.appendChild(li);
+      if (subText[i]=='-') {
+        const hr=document.createElement("hr");
+        hr.className="dropdown-divider";
+        li.appendChild(hr);
+      } else {
+        const a=document.createElement("a");
+        li.appendChild(a);
+        a.className="dropdown-item";
+        a.style.cursor="pointer";
+        a.onclick=subAction[i];
+        a.innerHTML=subText[i];
+      }
+    }
   }
 
   #getChartOptions() {
@@ -393,7 +442,7 @@ class PlotPanel extends Panel {
           return NaN;
         }
       });
-      data.datasets.push({type: 'line', pointRadius: 0, label: this.#graphData[i].name+':='+this.#inputGraph[i].value, data: yValues, borderColor: this.#graphData[i].color});
+      data.datasets.push({type: 'line', pointRadius: 0, label: this.#graphData[i].name+':='+this.#inputGraph[i].value, data: yValues, borderColor: this.#graphData[i].color, pointHitRadius: 30});
       yValuesAll.push(yValues);
     }
 
@@ -435,6 +484,26 @@ class PlotPanel extends Panel {
       this.#updateChart();
       this.#justZooming=false;
     },0);
+  }
+
+  #setSize(mode) {
+    switch (mode) {
+      case 0: /* Maximum size */
+        this.#canvas.style.maxHeight="";
+        break;
+      case 1: /* Minimum size */
+        this.#canvas.style.maxHeight="568px";
+        break;
+      case 2: /* Medium size */
+        this.#canvas.style.maxHeight="800px";
+        break;
+      case 3: /* Large size */
+        this.#canvas.style.maxHeight="1024px";
+        break;
+    }
+    this.#canvas.style.width="";
+    this.#canvas.style.height="";
+    this.#chart.update();
   }
 
   #copyTable() {

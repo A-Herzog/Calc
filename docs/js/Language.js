@@ -145,9 +145,20 @@ lang.calc.panelInfoText=`
 
 lang.plot={};
 lang.plot.clearInput="Eingabe löschen";
+lang.plot.clearInputAll="Alle löschen";
+lang.plot.clearInputAllHint="Löscht alle dargestellten Funktionen.";
 lang.plot.resetZoom="Standardzoom";
+lang.plot.resetZoomHint="Setzt den dargestellten Bereich wieder auf die Standardwerte zurück."
 lang.plot.zoomInfo="Mit gedrückter <span class='border rounded-1 ps-1 pe-1'><tt>Strg</tt></span>-Taste kann per Mausrad gezoomt werden und es können Zoom-Rahmen aufgezogen werden.";
 lang.plot.resetZoomAspectRatio="Seitenverhältnis";
+lang.plot.resetZoomAspectRatioHint="Stellt den auf der y-Achse dargestellten Bereich so ein, dass sich in x- und in y-Richtung dieselbe Anzahl an Pixeln pro Zahleneinheit ergibt.";
+lang.plot.size="Größe";
+lang.plot.sizeSmall="Klein";
+lang.plot.sizeMedium="Mittel";
+lang.plot.sizeLarge="Groß";
+lang.plot.sizeFull="Maximalgröße";
+lang.plot.axis="Achsenposition";
+lang.plot.axisHint="Schaltet zwischen einer Position der x- und der y-Achse links bzw. unten und zentriert um.";
 lang.plot.infoDiagramSaveValues="Werte speichern";
 lang.plot.infoDiagramSaveValuesTextFiles="Textdateien";
 lang.plot.infoDiagramSaveValues="Diagramm speichern";
@@ -893,9 +904,20 @@ lang.calc.panelInfoText=`
 
 lang.plot={};
 lang.plot.clearInput="Clear input";
+lang.plot.clearInputAll="Clear all";
+lang.plot.clearInputAllHint="Deletes all displayed functions.";
 lang.plot.resetZoom="Reset zoom";
+lang.plot.resetZoomHint="Resets the displayed area to the default values."
 lang.plot.zoomInfo="By holding down the <span class='border rounded-1 ps-1 pe-1 bg-light'><tt>Ctrl</tt></span> key, the mouse wheel can be used to zoom in and out, and zoom frames can be drawn.";
 lang.plot.resetZoomAspectRatio="Aspect ratio";
+lang.plot.resetZoomAspectRatioHint="Adjusts the range shown on the y-axis so that the same number of pixels per number unit results in the x and y directions.";
+lang.plot.size="Size";
+lang.plot.sizeSmall="Small";
+lang.plot.sizeMedium="Medium";
+lang.plot.sizeLarge="Large";
+lang.plot.sizeFull="Maximum size";
+lang.plot.axis="Axis position";
+lang.plot.axisHint="Switches between a position of the x- and y-axis on the left or bottom and centered.";
 lang.plot.infoDiagramSaveValues="Save values";
 lang.plot.infoDiagramSaveValuesTextFiles="Text files";
 lang.plot.infoDiagramSaveValues="Save diagram";
