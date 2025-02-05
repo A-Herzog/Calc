@@ -229,6 +229,16 @@ function buildExpressions() {
     {symbol: "acoth", full: "acoth(x)", data: "acoth"}
   ]));
 
+  /* Number systems */
+  expressions.push(buildGroup(language.expressionBuilder.numberSystems,iconConst,[
+    {symbol: "binnumber", full: "binnumber(x)", data: "binnumber", examples: ["binnumber(10)=2","binnumber("+formatNumberMax(1.1)+")="+formatNumberMax(1.5)]},
+    {symbol: "octnumber", full: "octnumber(x)", data: "octnumber", examples: ["octnumber(10)=8","octnumber("+formatNumberMax(1.4)+")="+formatNumberMax(1.5)]},
+    {symbol: "hexnumber", full: "hexnumber(x)", data: "hexnumber", examples: ["hexnumber(10)=16","hexnumber(f)=15"]},
+    {symbol: "bin", full: "bin(x)", data: "bin", examples: ["bin(3)=0b11"]},
+    {symbol: "oct", full: "oct(x)", data: "oct", examples: ["oct(9)=0o11"]},
+    {symbol: "hex", full: "hex(x)", data: "hex", examples: ["hex(31)=0h1f"]}
+  ]));
+
   /* Complex numbers */
   expressions.push(buildGroup(language.expressionBuilder.complex,iconComplex,[
     {symbol: "i", data: "i", icon: iconConst},

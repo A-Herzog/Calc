@@ -17,7 +17,7 @@ limitations under the License.
 export {NumberSystemsPanel};
 
 import {Panel} from './Panel.js';
-import {formatNumberMax, getDecimalSeparatorCharacter} from './NumberTools.js';
+import {formatNumberMax, getDecimalSeparatorCharacter, getFloatBase} from './NumberTools.js';
 import {language} from './Language.js';
 
 
@@ -120,7 +120,7 @@ class NumberSystemsPanel extends Panel {
     if (oldBase==null) {
       num=null;
     } else {
-      num=this.#getNumber(this.#bases[index].edit.value,oldBase);
+      num=getFloatBase(this.#bases[index].edit.value,oldBase);
       this.#bases[index].edit.classList.toggle("is-invalid",num==null);
     }
 
@@ -142,58 +142,10 @@ class NumberSystemsPanel extends Panel {
   const base=2;
   for (let n of numbers) {
     const s=this.#toBase(n,base);
-    const n2=this.#getNumber(s,base);
+    const n2=getFloatBase(s,base);
     console.log(n.toLocaleString()+"\t->\t"+s+"\t->\t"+n2.toLocaleString());
   }
   */
-
-  #getNumber(str, base) {
-    /* Sign */
-    str=str.trim();
-    const minus=(str!='' && str[0]=='-');
-    if (minus) str=str.substring(1);
-
-    /* Test for invalid characters */
-    for (let c of str) {
-      if (c==',' || c=='.') continue;
-      if (c>='0' && c<='9') {
-        c=parseInt(c);
-        if (isNaN(c)) return null;
-        if (base<10 && c>=base) return null;
-      } else {
-        c=c.toUpperCase();
-        c=c.charCodeAt()-'A'.charCodeAt()+10;
-        if (c>=base) return null;
-      }
-    }
-
-    /* Split integer and fraction part */
-    const index1=str.indexOf('.');
-    const index2=str.indexOf(',');
-    if (index1>=0 && index2>=0) return null;
-    let index=(index1>=0)?index1:index2;
-    let intPart="";
-    let fracPart="";
-    if (index>=0) {
-        intPart=str.substring(0,index);
-        fracPart=str.substring(index+1);
-    } else {
-        intPart=str;
-    }
-
-    /* Integer part */
-    const intPartBase10=parseInt(intPart,base);
-    if (isNaN(intPartBase10)) return null;
-
-    /* Fraction part */
-    while (fracPart!='' && fracPart[fracPart.length-1]=='0') fracPart=fracPart.substring(0,fracPart.length-1);
-    if (fracPart=='') return (minus?(-1):1)*intPartBase10;
-    let fracPartBase10=parseInt(fracPart,base);
-    if (isNaN(fracPartBase10)) return null;
-    for (let i=0;i<fracPart.length;i++) fracPartBase10/=base;
-
-    return (minus?(-1):1)*(intPartBase10+fracPartBase10);
-  }
 
   #toBase(num, base) {
     if (base==10) return formatNumberMax(num);
@@ -223,7 +175,9 @@ class NumberSystemsPanel extends Panel {
     let str=num.toString(base);
 
     const c=getDecimalSeparatorCharacter();
-    str=str.substring(0,str.length-steps)+c+str.substring(str.length-steps);
+    let intPartStr=str.substring(0,str.length-steps);
+    if (intPartStr=='') intPartStr='0';
+    str=intPartStr+c+str.substring(str.length-steps);
 
     return (minus?"-":"")+str;
   }

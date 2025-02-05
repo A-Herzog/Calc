@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export {getFloat, getPositiveFloat, getNotNegativeFloat, getInt, getBigInt, getPositiveInt, getPositiveBigInt, getNotNegativeInt, formatNumber, formatNumberMax, formatNumberWithTitle, formatPercent, getDecimalSeparatorCharacter}
+export {getFloat, getPositiveFloat, getNotNegativeFloat, getInt, getBigInt, getPositiveInt, getPositiveBigInt, getNotNegativeInt, formatNumber, formatNumberMax, formatNumberWithTitle, formatPercent, getDecimalSeparatorCharacter, getFloatBase}
 
 /**
  * Parses a string to a floating point number
@@ -62,7 +62,7 @@ function getString(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to a floating point number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as floating point number or null, if the content could not be parsed to a floating point number
  */
 function getFloat(elementOrString) {
@@ -75,7 +75,7 @@ function getFloat(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to a floating point number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as floating point number or null, if the content could not be parsed to a positive floating point number
  */
 function getPositiveFloat(elementOrString) {
@@ -86,7 +86,7 @@ function getPositiveFloat(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to a floating point number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as floating point number or null, if the content could not be parsed to a non-negative floating point number
  */
 function getNotNegativeFloat(elementOrString) {
@@ -97,7 +97,7 @@ function getNotNegativeFloat(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to an integer number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as integer number or null, if the content could not be parsed to an integer number
  */
 function getInt(elementOrString) {
@@ -109,7 +109,7 @@ return num;
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to a BigInt
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as BigInt or null, if the content could not be parsed to an integer number
  */
 function getBigInt(elementOrString) {
@@ -120,7 +120,7 @@ function getBigInt(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to an integer number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as integer number or null, if the content could not be parsed to a positive integer number
  */
 function getPositiveInt(elementOrString) {
@@ -131,7 +131,7 @@ function getPositiveInt(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to a BigInt
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as BigInt or null, if the content could not be parsed to a positive integer number
  */
 function getPositiveBigInt(elementOrString) {
@@ -142,7 +142,7 @@ function getPositiveBigInt(elementOrString) {
 
 /**
  * Parses a string or the content of a value attribute of a HTML element to an integer number
- * @param {an} elementOrString HTML element with value property or a string
+ * @param {any} elementOrString HTML element with value property or a string
  * @returns Content as integer number or null, if the content could not be parsed to a non-negative integer number
  */
 function getNotNegativeInt(elementOrString) {
@@ -216,4 +216,58 @@ function formatPercent(number, digits) {
 function getDecimalSeparatorCharacter() {
     const n=1.1;
     return n.toLocaleString().substring(1,2);
+}
+
+/**
+ * Parses a string to a floating point number
+ * @param {String} str String to be parsed
+ * @param {Number}  Base for the number in the string (for example 16 to interpret a hexdecimal string)
+ * @returns Content as floating point number (with base 10) or null, if the content could not be parsed
+ */
+function getFloatBase(str, base) {
+  /* Sign */
+  str=str.trim();
+  const minus=(str!='' && str[0]=='-');
+  if (minus) str=str.substring(1);
+
+  /* Test for invalid characters */
+  for (let c of str) {
+    if (c==',' || c=='.') continue;
+    if (c>='0' && c<='9') {
+      c=parseInt(c);
+      if (isNaN(c)) return null;
+      if (base<10 && c>=base) return null;
+    } else {
+      c=c.toUpperCase();
+      c=c.charCodeAt()-'A'.charCodeAt()+10;
+      if (c>=base) return null;
+    }
+  }
+
+  /* Split integer and fraction part */
+  const index1=str.indexOf('.');
+  const index2=str.indexOf(',');
+  if (index1>=0 && index2>=0) return null;
+  let index=(index1>=0)?index1:index2;
+  let intPart="";
+  let fracPart="";
+  if (index>=0) {
+      intPart=str.substring(0,index);
+      fracPart=str.substring(index+1);
+  } else {
+      intPart=str;
+  }
+
+  /* Integer part */
+  const intPartBase10=parseInt(intPart,base);
+  if (isNaN(intPartBase10)) return null;
+
+  /* Fraction part */
+  while (fracPart!='' && fracPart[fracPart.length-1]=='0') fracPart=fracPart.substring(0,fracPart.length-1);
+  if (fracPart=='') return (minus?(-1):1)*intPartBase10;
+  let fracPartBase10=parseInt(fracPart,base);
+  if (isNaN(fracPartBase10)) return null;
+  for (let i=0;i<fracPart.length;i++) fracPartBase10/=base;
+
+  return (minus?(-1):1)*(intPartBase10+fracPartBase10);
 }

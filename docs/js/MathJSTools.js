@@ -16,7 +16,7 @@ limitations under the License.
 
 export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
 
-import {formatNumber} from './NumberTools.js';
+import {formatNumber, getFloatBase} from './NumberTools.js';
 import {betafn, lowRegGamma} from '../libs/jstat-special.js';
 import {factorize, collectFactors, getPhi} from './PanelPrimeFactorsPanel.js';
 
@@ -305,13 +305,41 @@ function loadMathJSExtensions() {
   });
 }
 
+const decimalSeparatorReplace=new RegExp('\\,|\\;','g');
+
+const bin=new RegExp("(binnumber\\()([01\.]+)(\\))",'i');
+const oct=new RegExp("(octnumber\\()([0-7\.]+)(\\))",'i');
+const hex=new RegExp("(hexnumber\\()([0-9a-f\.]+)(\\))",'i');
+
+/**
+ * Tries to find a number base conversion function and the process the base transformation.
+ * @param {String} input Input to be evaluated
+ * @param {RegExp} matcher Regular expression to be applied
+ * @param {Number} base Base to be used for the parameter of the function
+ * @returns Preprocessed input
+ */
+function preprocessBaseUnit(input, matcher, base) {
+  const data=input.match(matcher);
+  if (data==null) return input;
+
+  const result=getFloatBase(data[2],base);
+  if (result==null) return input;
+  return input.substring(0,data.index)+result+input.substring(data.index+data[0].length);
+}
+
 /**
  * Preprocesses an input string before giving it to Math.evaluate(...).
  * @param {String} input Input to be evaluated
  * @returns Preprocessed input
  */
 function preprocessInput(input) {
-    return input.replace(new RegExp('\\,|\\;','g'),match=>match===','?'.':',');
+    input=input.replace(decimalSeparatorReplace,match=>match===','?'.':',');
+
+    input=preprocessBaseUnit(input,bin,2);
+    input=preprocessBaseUnit(input,oct,8);
+    input=preprocessBaseUnit(input,hex,16);
+
+    return input;
 }
 
 /**
