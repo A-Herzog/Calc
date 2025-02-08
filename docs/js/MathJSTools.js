@@ -19,6 +19,7 @@ export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
 import {formatNumber, getFloatBase} from './NumberTools.js';
 import {betafn, lowRegGamma} from '../libs/jstat-special.js';
 import {factorize, collectFactors, getPhi} from './PanelPrimeFactorsPanel.js';
+import {erlangC_Pt, erlangC_ENQ, erlangC_EN, erlangC_EW, erlangC_EV, extErlangC_Pt, extErlangC_ENQ, extErlangC_EN, extErlangC_EW, extErlangC_EV, extErlangC_PA, AC_ENQ, AC_EN, AC_EW, AC_EV} from './QTTools.js';
 
 /* Math JS extensions */
 
@@ -301,7 +302,22 @@ function loadMathJSExtensions() {
     harmonicmean: harmonicmean,
     skewness: skewness,
     kurtosis: kurtosis,
-    eulerphi: eulerphi
+    eulerphi: eulerphi,
+    erlangC_Pt: erlangC_Pt,
+    erlangC_ENQ: erlangC_ENQ,
+    erlangC_EN: erlangC_EN,
+    erlangC_EW: erlangC_EW,
+    erlangC_EV: erlangC_EV,
+    extErlangC_Pt: extErlangC_Pt,
+    extErlangC_ENQ: extErlangC_ENQ,
+    extErlangC_EN: extErlangC_EN,
+    extErlangC_EW: extErlangC_EW,
+    extErlangC_EV: extErlangC_EV,
+    extErlangC_PA: extErlangC_PA,
+    AC_ENQ: AC_ENQ,
+    AC_EN: AC_EN,
+    AC_EW: AC_EW,
+    AC_EV: AC_EV
   });
 }
 

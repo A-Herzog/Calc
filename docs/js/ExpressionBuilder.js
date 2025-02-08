@@ -272,7 +272,28 @@ function buildExpressions() {
     {symbol: "random", full: "random(a;b)", data: "random",  examples: ["random()","random(0;"+formatNumberMax(7.5)+")"]},
     {symbol: "randomInt", full: "randomInt(a;b)", data: "randomInt", examples: ["randomInt(0;10)"]},
     buildGroup(language.expressionBuilder.stochastics.discrete,iconFunction,generateProbabilityDistributionsRecords(getDistributions().filter(dist=>dist.isDiscrete).sort((d1,d2)=>d1.displayName.localeCompare(d2.displayName)))),
-    buildGroup(language.expressionBuilder.stochastics.continuous,iconFunction,generateProbabilityDistributionsRecords(getDistributions().filter(dist=>!dist.isDiscrete).sort((d1,d2)=>d1.displayName.localeCompare(d2.displayName))))
+    buildGroup(language.expressionBuilder.stochastics.continuous,iconFunction,generateProbabilityDistributionsRecords(getDistributions().filter(dist=>!dist.isDiscrete).sort((d1,d2)=>d1.displayName.localeCompare(d2.displayName)))),
+    buildGroup(language.expressionBuilder.stochastics.erlangC,iconFunction,[
+      {symbol: "erlangC_Pt", full: "erlangC_Pt(lambda;mu;c;t)", data: "erlangC_Pt"},
+      {symbol: "erlangC_ENQ", full: "erlangC_ENQ(lambda;mu;c)", data: "erlangC_ENQ"},
+      {symbol: "erlangC_EN", full: "erlangC_EN(lambda;mu;c)", data: "erlangC_EN"},
+      {symbol: "erlangC_EW", full: "erlangC_EW(lambda;mu;c)", data: "erlangC_EW"},
+      {symbol: "erlangC_EV", full: "erlangC_EV(lambda;mu;c)", data: "erlangC_EV"}
+    ]),
+    buildGroup(language.expressionBuilder.stochastics.extErlangC,iconFunction,[
+      {symbol: "extErlangC_Pt", full: "extErlangC_Pt(lambda;mu;nu;c;K;t)", data: "extErlangC_Pt"},
+      {symbol: "extErlangC_ENQ", full: "extErlangC_ENQ(lambda;mu;nu;c;K)", data: "extErlangC_ENQ"},
+      {symbol: "extErlangC_EN", full: "extErlangC_EN(lambda;mu;nu;c;K)", data: "extErlangC_EN"},
+      {symbol: "extErlangC_EW", full: "extErlangC_EW(lambda;mu;nu;c;K)", data: "extErlangC_EW"},
+      {symbol: "extErlangC_EV", full: "extErlangC_EV(lambda;mu;nu;c;K)", data: "extErlangC_EV"},
+      {symbol: "extErlangC_PA", full: "extErlangC_PA(lambda;mu;nu;c;K)", data: "extErlangC_PA"}
+    ]),
+    buildGroup(language.expressionBuilder.stochastics.AC,iconFunction,[
+      {symbol: "AC_ENQ", full: "AC_ENQ(lambda;mu;CVI;CVS;c)", data: "AC_ENQ"},
+      {symbol: "AC_EN", full: "AC_EN(lambda;mu;CVI;CVS;c)", data: "AC_EN"},
+      {symbol: "AC_EW", full: "AC_EW(lambda;mu;CVI;CVS;c)", data: "AC_EW"},
+      {symbol: "AC_EV", full: "AC_EV(lambda;mu;CVI;CVS;c)", data: "AC_EV"}
+    ]),
   ]));
 
   /* Logic functions */
