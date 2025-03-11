@@ -99,7 +99,8 @@ class UnitsConverterPanel extends Panel {
       {name: language.units.velocityMih, unit: "miles/h", factor: 1.609344},
       {name: language.units.velocityKnots, unit: language.units.velocityKnotsUnit, factor: 1.852, wiki: language.units.velocityKnotsWiki},
       {name: language.units.velocityMach, unit: "Mach", factor: 1236, wiki: language.units.velocityMachWiki},
-      {name: language.units.velocityLightspeed, factor: 3.6*299792458, wiki: language.units.velocityLightspeedWiki}
+      {name: language.units.velocityLightspeed, factor: 3.6*299792458, wiki: language.units.velocityLightspeedWiki},
+      {name: language.units.velocityWarpFaktor, calcToBase: x=>warpTokmh(x), calcFromBase: x=>kmhToWarp(x), wiki: language.units.velocityWarpFaktorWiki}
     ]);
 
     this.#buildUnitsPanel(language.units.power,[
@@ -265,4 +266,30 @@ class UnitsConverterPanel extends Panel {
       }
     }
   }
+}
+
+function warpToLightSpeed(x) {
+  if (x<=0) return 0;
+  return x**((10/3) / (1 - (x/10)**(( 91.28 / (10-x)**0.27))));
+}
+
+function lightSpeedToWarp(x) {
+  if (x<=0) return 0;
+
+  let w1=0;
+  let w2=9.9999;
+  while (w2-w1>0.000000001) {
+    const w=(w1+w2)/2;
+    const l=warpToLightSpeed(w);
+    if (l>x) w2=w; else w1=w;
+  }
+  return Math.round((w1+w2)/2*1000000000)/1000000000;
+}
+
+function warpTokmh(x) {
+  return warpToLightSpeed(x)*3.6*299792458;
+}
+
+function kmhToWarp(x) {
+  return lightSpeedToWarp(x/(3.6*299792458));
 }
