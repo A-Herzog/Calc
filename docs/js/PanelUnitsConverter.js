@@ -100,7 +100,7 @@ class UnitsConverterPanel extends Panel {
       {name: language.units.velocityKnots, unit: language.units.velocityKnotsUnit, factor: 1.852, wiki: language.units.velocityKnotsWiki},
       {name: language.units.velocityMach, unit: "Mach", factor: 1236, wiki: language.units.velocityMachWiki},
       {name: language.units.velocityLightspeed, factor: 3.6*299792458, wiki: language.units.velocityLightspeedWiki},
-      {name: language.units.velocityWarpFaktor, calcToBase: x=>warpTokmh(x), calcFromBase: x=>kmhToWarp(x), wiki: language.units.velocityWarpFaktorWiki}
+      {name: language.units.velocityWarpFactor, calcToBase: x=>warpTokmh(x), calcFromBase: x=>kmhToWarp(x), wiki: language.units.velocityWarpFactorWiki}
     ]);
 
     this.#buildUnitsPanel(language.units.power,[

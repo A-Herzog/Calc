@@ -89,6 +89,7 @@ function generateProbabilityDistributionsRecords(distributions) {
 
   for (let distribution of distributions) {
     const parameters=distribution.parameterInfo.map(p=>p.id).join(";");
+    const semicolonParameters=(parameters=='')?'':(';'+parameters);
     const parameterTexts=distribution.parameterInfo.map(p=>buildParameterInfoText(p)).join("");
 
     const group=[
@@ -96,29 +97,29 @@ function generateProbabilityDistributionsRecords(distributions) {
         name: (distribution.isDiscrete?language.expressionBuilder.stochastics.pdfDiscreteName:language.expressionBuilder.stochastics.pdfName)+" (<tt>"+distribution.name+"_pdf</tt>)",
         info:
           "<p><strong>"+language.expressionBuilder.labelExpression+":</strong></p>"+
-          "<p><tt>"+distribution.name+"_pdf(x;"+parameters+")</tt></p>"+
+          "<p><tt>"+distribution.name+"_pdf(x"+semicolonParameters+")</tt></p>"+
           "<p><strong>"+language.expressionBuilder.labelDescription+":</strong></p>"+
           "<p>"+(distribution.isDiscrete?language.expressionBuilder.stochastics.pdfDiscreteInfo:language.expressionBuilder.stochastics.pdfInfo)+"</p>"+
           "<ul>"+
           "<li><tt>x</tt>: "+language.expressionBuilder.stochastics.pdfParameterX+"</li>"+
           parameterTexts+
           "</ul>",
-        full: distribution.name+"_pdf(x;"+parameters+")",
-        symbol: distribution.name+"_pdf(x;"+parameters+")"
+        full: distribution.name+"_pdf(x"+semicolonParameters+")",
+        symbol: distribution.name+"_pdf(x"+semicolonParameters+")"
       },
       {
         name: language.expressionBuilder.stochastics.cdfName+" (<tt>"+distribution.name+"_cdf</tt>)",
         info:
           "<p><strong>"+language.expressionBuilder.labelExpression+":</strong></p>"+
-          "<p><tt>"+distribution.name+"_cdf(x;"+parameters+")</tt></p>"+
+          "<p><tt>"+distribution.name+"_cdf(x"+semicolonParameters+")</tt></p>"+
           "<p><strong>"+language.expressionBuilder.labelDescription+":</strong></p>"+
           "<p>"+language.expressionBuilder.stochastics.cdfInfo+"</p>"+
           "<ul>"+
           "<li><tt>x</tt>: "+language.expressionBuilder.stochastics.cdfParameterX+"</li>"+
           parameterTexts+
           "</ul>",
-        full: distribution.name+"_cdf(x;"+parameters+")",
-        symbol: distribution.name+"_cdf(x;"+parameters+")"
+        full: distribution.name+"_cdf(x"+semicolonParameters+")",
+        symbol: distribution.name+"_cdf(x"+semicolonParameters+")"
       },
       {
         name: language.expressionBuilder.stochastics.randomName+" (<tt>"+distribution.name+"_random</tt>)",

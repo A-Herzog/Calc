@@ -411,6 +411,7 @@ class NegativeBinomialDistribution extends DiscreteProbabilityDistribution {
   }
 }
 
+
 /**
  * Zeta distribution
  */
@@ -448,6 +449,80 @@ class RademacherDistribution extends DiscreteProbabilityDistribution {
 
   _getRandomNumber(values) {
     return (Math.random()>=0.5)?1:-1;
+  }
+}
+
+
+/**
+ * Bernoulli distribution
+ */
+class BernoulliDistribution extends DiscreteProbabilityDistribution {
+  constructor() {
+    super("bernoulli",language.expressionBuilder.stochastics.distribution.bernoulli);
+
+    this._addContinuousParameter("p",0,false,1,false);
+  }
+
+  _getPDF(values, k) {
+    if (k==0) return 1-values.p;
+    if (k==1) return values.p;
+    return 0;
+  }
+}
+
+
+/**
+ * Borel distribution
+ */
+class BorelDistribution extends DiscreteProbabilityDistribution {
+  constructor() {
+    super("borel",language.expressionBuilder.stochastics.distribution.borel);
+
+    this._addContinuousParameter("mu",0,false,1,false);
+  }
+
+  _getPDF(values, k) {
+    if (k<=0) return 0;
+
+    const mu=values.mu;
+    let fraction=Math.exp(-mu*k)/k;
+    for (let i=1;i<=k-1;i++) {
+      fraction*=(mu*k)/i;
+    }
+    return fraction;
+  }
+}
+
+
+/**
+ * Gauss-Kuzmin distribution
+ */
+class GaussKuzminDistribution extends DiscreteProbabilityDistribution {
+  constructor() {
+    super("gaussKuzmin",language.expressionBuilder.stochastics.distribution.gaussKuzmin);
+  }
+
+  _getPDF(values, k) {
+    if (k<=0) return 0;
+    return -Math.log2(1-1/((k+1)**2));
+  }
+}
+
+
+/**
+ * Logarithmic distribution
+ */
+class LogarithmicDistribution extends DiscreteProbabilityDistribution {
+  constructor() {
+    super("logarithmic",language.expressionBuilder.stochastics.distribution.logarithmic);
+
+    this._addContinuousParameter("p",0,false,1,false);
+  }
+
+  _getPDF(values, k) {
+    if (k<=0) return 0;
+    const densityFactor=-1/Math.log(1-values.p);
+    return densityFactor*Math.pow(values.p,k)/k;
   }
 }
 
@@ -1628,6 +1703,185 @@ class WignerSemicircleDistribution extends ContinuousProbabilityDistribution {
 }
 
 
+/**
+ * Fatigue-Life distribution
+ */
+class FatigueLifeDistribution extends ContinuousProbabilityDistribution {
+  #stdNormPDFFactor=1/Math.sqrt(2*Math.PI);
+
+  constructor() {
+    super("fatiguelife",language.expressionBuilder.stochastics.distribution.fatigueLife);
+    this._addContinuousParameter("mu",null,false,null,false);
+    this._addContinuousParameter("beta",0,false,null,false);
+    this._addContinuousParameter("gamma",0,false,null,false);
+  }
+
+  #getStdNormPDF(x) {
+    return this.#stdNormPDFFactor*Math.exp(-0.5*x**2);
+  }
+
+  #getStdNormCDF(x) {
+    return 0.5*(1+erf(1/Math.sqrt(2)*x));
+  }
+
+  _getPDF(values, x) {
+    if (x<=values.mu) return 0;
+
+    const inverseBeta=1/values.beta;
+    const inverseGamma=1/values.gamma;
+
+    const param=(x-values.mu)*inverseBeta;
+		const part1=Math.sqrt(param);
+		const part2=Math.sqrt(1/param);
+		const numerator1=part1+part2;
+		const numerator2=part1-part2;
+		return numerator1/(2*values.gamma*(x-values.mu))*this.#getStdNormPDF(numerator2*inverseGamma);
+  }
+
+  _getCDF(values, x) {
+    if (x<=values.mu) return 0;
+
+    const inverseBeta=1/values.beta;
+    const inverseGamma=1/values.gamma;
+
+    const param=(x-values.mu)*inverseBeta;
+		const numerator=Math.sqrt(param)-Math.sqrt(1/param);
+		return this.#getStdNormCDF(numerator*inverseGamma);
+  }
+}
+
+
+/**
+ * Frechet distribution
+ */
+class FrechetDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("frechet",language.expressionBuilder.stochastics.distribution.frechet);
+    this._addContinuousParameter("delta",null,false,null,false);
+    this._addContinuousParameter("beta",0,false,null,false);
+    this._addContinuousParameter("alpha",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<=values.delta) return 0;
+
+    const z=(x-values.delta)/values.beta;
+    return values.alpha*Math.exp(-Math.pow(z,-values.alpha))/(values.beta*Math.pow(z,values.alpha+1));
+  }
+
+  _getCDF(values, x) {
+    if (x<=values.delta) return 0;
+
+    const z=(x-values.delta)/values.beta;
+    return Math.exp(-1/Math.pow(z,values.alpha));
+  }
+
+  _getRandomNumber(values) {
+    const u=Math.random();
+    return Math.pow(-Math.log(u),-1/values.alpha)*values.beta+values.delta;
+  }
+}
+
+
+/**
+ * Log-Cauchy distribution
+ */
+class LogCauchyDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("logcauchy",language.expressionBuilder.stochastics.distribution.logCauchy);
+    this._addContinuousParameter("mu",null,false,null,false);
+    this._addContinuousParameter("sigma",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<=0) return 0;
+    const invPi=1/Math.PI;
+    return invPi/x*values.sigma/((Math.log(x)-values.mu)**2+values.sigma**2);
+  }
+
+  _getCDF(values, x) {
+    if (x<=0) return 0;
+    const invPi=1/Math.PI;
+    return invPi*Math.atan((Math.log(x)-values.mu)/values.sigma)+0.5;
+  }
+
+  _getRandomNumber(values) {
+    const u=Math.random();
+	  /*
+	  p=1/pi*arctan((log(x)-mu)/sigma)+0.5
+	  <=> tan((p-0.5)*pi)=(log(x)-mu)/sigma
+	  <=> exp(tan((p-0.5)*pi)*sigma+mu)=x
+	   */
+	  return Math.exp(Math.tan((u-0.5)*Math.PI)*values.sigma+values.mu);
+  }
+}
+
+
+/**
+ * Power distribution
+ */
+class PowerDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("power",language.expressionBuilder.stochastics.distribution.power);
+    this._addContinuousParameter("a",null,false,null,false);
+    this._addContinuousParameter("b",null,false,null,false);
+    this._addContinuousParameter("c",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<values.a || x>values.b) return 0;
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
+
+    const denominator=Math.pow(values.b-values.a,values.c);
+    return values.c*Math.pow(x-values.a,values.c-1)/denominator;
+  }
+
+  _getCDF(values, x) {
+    if (x<values.a) return 0;
+    if (x>values.b) return 1;
+    if (values.a==values.b) return (x>=values.a)?1:0;
+
+    const denominator=Math.pow(values.b-values.a,values.c);
+    return Math.pow(x-values.a,values.c)/denominator;
+  }
+
+  _getRandomNumber(values) {
+    const u=Math.random();
+
+    if (values.a==values.b) return values.a;
+
+    const denominator=Math.pow(values.b-values.a,values.c);
+    const inverseC=1/values.c;
+    return Math.pow(u*denominator,inverseC)+values.a;
+  }
+}
+
+
+/**
+ * Rayleigh distribution
+ */
+class RayleighDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("rayleigh",language.expressionBuilder.stochastics.distribution.rayleigh);
+    this._addContinuousParameter("m",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<0) return 0;
+    const sigma=Math.sqrt(2/Math.PI)*values.m;
+    const sigma2=sigma**2;
+    return x/sigma2*Math.exp(-(x**2)/2/sigma2);
+  }
+
+  _getCDF(values, x) {
+    if (x<0) return 0;
+    const sigma=Math.sqrt(2/Math.PI)*values.m;
+    const sigma2=sigma**2;
+    return 1-Math.exp(-(x**2)/2/sigma2);
+  }
+}
+
+
 /* ============================================================================
  * Setup
  * ============================================================================ */
@@ -1649,6 +1903,10 @@ function getDistributions() {
     new NegativeBinomialDistribution(),
     new ZetaDistribution(),
     new RademacherDistribution(),
+    new BernoulliDistribution(),
+    new BorelDistribution(),
+    new GaussKuzminDistribution(),
+    new LogarithmicDistribution(),
 
     /* Continuous distributions */
     new UniformDistribution(),
@@ -1684,7 +1942,12 @@ function getDistributions() {
     new TriangularDistribution(),
     new UQuadraticDistribution(),
     new WeibullDistribution(),
-    new WignerSemicircleDistribution()
+    new WignerSemicircleDistribution(),
+    new FatigueLifeDistribution(),
+    new FrechetDistribution(),
+    new LogCauchyDistribution(),
+    new PowerDistribution(),
+    new RayleighDistribution()
   ];
 
   return distributions;
