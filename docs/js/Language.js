@@ -187,6 +187,7 @@ lang.numbers.base8="Oktal";
 lang.numbers.base10="Dezimal";
 lang.numbers.base16="Hexadezimal";
 lang.numbers.baseFree="Frei";
+lang.numbers.UTF16="UTF-16";
 
 lang.primeFactors={};
 lang.primeFactors.number1="Zahl 1";
@@ -1032,6 +1033,7 @@ lang.numbers.base8="Octal";
 lang.numbers.base10="Decimal";
 lang.numbers.base16="Hexadecimal";
 lang.numbers.baseFree="Free";
+lang.numbers.UTF16="UTF-16";
 
 lang.primeFactors={};
 lang.primeFactors.number1="Number 1";

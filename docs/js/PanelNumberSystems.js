@@ -31,7 +31,8 @@ class NumberSystemsPanel extends Panel {
     {name: language.numbers.base8, base: 8},
     {name: language.numbers.base10, base: 10},
     {name: language.numbers.base16, base: 16},
-    {name: language.numbers.baseFree, base: null},
+    {name: language.numbers.baseFree, base: 'free'},
+    {name: language.numbers.UTF16, base: 'char'},
   ];
   #freeBase;
 
@@ -61,7 +62,7 @@ class NumberSystemsPanel extends Panel {
     const label=document.createElement("label");
     td.appendChild(label);
     label.className="form-label";
-    if (setup.base==null) {
+    if (typeof(setup.base)=='string') {
       label.innerHTML=setup.name+":";
     } else {
       label.innerHTML=setup.name+" ("+language.numbers.base+" "+setup.base+"):";
@@ -80,8 +81,13 @@ class NumberSystemsPanel extends Panel {
     edit.oninput=()=>this.#calc(edit);
     label.htmlFor=edit;
 
+    /* ASCII mode? */
+    if (setup.base=='char') {
+      edit.maxLength=1;
+    }
+
     /* Free mode? */
-    if (setup.base==null) {
+    if (setup.base=='free') {
       const label2=document.createElement("label");
       td.appendChild(label2);
       label2.className="form-label";
@@ -115,23 +121,37 @@ class NumberSystemsPanel extends Panel {
     this.#freeBase.classList.toggle("is-invalid",freeBase==null);
 
     /* Get number */
-    const oldBase=(this.#bases[index].base==null)?freeBase:this.#bases[index].base;
+    let oldBase=this.#bases[index].base;
+    if (oldBase=='free') oldBase=freeBase;
     let num;
     if (oldBase==null) {
       num=null;
     } else {
-      num=getFloatBase(this.#bases[index].edit.value,oldBase);
+      if (oldBase=='char') {
+        const str=this.#bases[index].edit.value.trim();
+        if (str.length==1) {
+          num=str.charCodeAt(0);
+          oldBase=10;
+        }
+      } else {
+        num=getFloatBase(this.#bases[index].edit.value,oldBase);
+      }
       this.#bases[index].edit.classList.toggle("is-invalid",num==null);
     }
 
     /* Transfer to all other lines */
     for (let i=0;i<this.#bases.length;i++) if (i!=index) {
-      const newBase=(this.#bases[i].base==null)?freeBase:this.#bases[i].base;
+      let newBase=this.#bases[i].base;
+      if (newBase=='free') newBase=freeBase;
       this.#bases[i].edit.classList.remove("is-invalid");
       if (newBase==null || num==null) {
         this.#bases[i].edit.value="";
       } else {
-        this.#bases[i].edit.value=this.#toBase(num,newBase);
+        if (newBase=='char') {
+          this.#bases[i].edit.value=(num%1==0 && num>0 && num<65536)?String.fromCharCode(num):'';
+        } else {
+          this.#bases[i].edit.value=this.#toBase(num,newBase);
+        }
       }
     }
   }
