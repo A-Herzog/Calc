@@ -237,7 +237,8 @@ function buildExpressions() {
     {symbol: "hexnumber", full: "hexnumber(x)", data: "hexnumber", examples: ["hexnumber(10)=16","hexnumber(f)=15"]},
     {symbol: "bin", full: "bin(x)", data: "bin", examples: ["bin(3)=0b11"]},
     {symbol: "oct", full: "oct(x)", data: "oct", examples: ["oct(9)=0o11"]},
-    {symbol: "hex", full: "hex(x)", data: "hex", examples: ["hex(31)=0h1f"]}
+    {symbol: "hex", full: "hex(x)", data: "hex", examples: ["hex(31)=0h1f"]},
+    {symbol: "convert", full: "convert(x;\"unit1\";\"unit2\")", data: "convert", examples: ["convert(10;\"km\";\"mm\")=10000000","convert(pi;\"RAD\";\"DEG\")=180"]}
   ]));
 
   /* Complex numbers */

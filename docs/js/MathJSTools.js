@@ -19,6 +19,7 @@ export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
 import {formatNumber, getFloatBase} from './NumberTools.js';
 import {betafn, lowRegGamma} from '../libs/jstat-special.js';
 import {factorize, collectFactors, getPhi} from './PanelPrimeFactorsPanel.js';
+import {getConvertData, convertValue} from './PanelUnitsConverter.js';
 import {erlangC_Pt, erlangC_ENQ, erlangC_EN, erlangC_EW, erlangC_EV, extErlangC_Pt, extErlangC_ENQ, extErlangC_EN, extErlangC_EW, extErlangC_EV, extErlangC_PA, AC_ENQ, AC_EN, AC_EW, AC_EV} from './QTTools.js';
 
 /* Math JS extensions */
@@ -262,7 +263,7 @@ function harmonicmean(...params) {
 }
 
 /**
- * Calculates Eulers phi function value for the given numer.
+ * Calculates Eulers phi function value for the given number.
  * @param {number} num Number for which phi is to be calculated
  * @returns Eulers phi number
  */
@@ -271,6 +272,44 @@ function eulerphi(num) {
   const factors=factorize(BigInt(Math.round(num)));
   const collectedFactors=collectFactors(factors);
   return getPhi(collectedFactors);
+}
+
+function unitConvert(value, oldName, newName) {
+  if (typeof(value)!='number') return Number.NaN;
+  if (typeof(oldName)!='string') return Number.NaN;
+  if (typeof(newName)!='string') return Number.NaN;
+
+  oldName=oldName.toLowerCase();
+  newName=newName.toLowerCase();
+
+  let oldRecord=null;
+  let newRecord=null;
+  let oldTopicIndex=-1;
+  let newTopicIndex=-1;
+
+  const data=getConvertData();
+  for (let i=0;i<data.length;i++) {
+    const topic=data[i];
+    for (let unit of topic) {
+      if (oldRecord==null) {
+        if (unit.name.toLowerCase()==oldName) {oldRecord=unit; oldTopicIndex=i;}
+        if (unit.unit && unit.unit.toLowerCase()==oldName) {oldRecord=unit; oldTopicIndex=i;}
+        if (unit.moreNames) for (let test of unit.moreNames) if (test.toLowerCase()==oldName) {oldRecord=unit; oldTopicIndex=i; break;}
+      }
+      if (newRecord==null) {
+        if (unit.name.toLowerCase()==newName) {newRecord=unit; newTopicIndex=i;}
+        if (unit.unit && unit.unit.toLowerCase()==newName) {newRecord=unit; newTopicIndex=i;}
+        if (unit.moreNames) for (let test of unit.moreNames) if (test.toLowerCase()==newName) {newRecord=unit; newTopicIndex=i; break;}
+      }
+      if (oldRecord!=null && newRecord!=null) break;
+    }
+    if (oldRecord!=null && newRecord!=null) break;
+  }
+
+  if (oldRecord==null || newRecord==null) return Number.NaN;
+  if (oldTopicIndex!=newTopicIndex) return Number.NaN;
+
+  return convertValue(value,oldRecord,newRecord);
 }
 
 /**
@@ -317,7 +356,8 @@ function loadMathJSExtensions() {
     AC_ENQ: AC_ENQ,
     AC_EN: AC_EN,
     AC_EW: AC_EW,
-    AC_EV: AC_EV
+    AC_EV: AC_EV,
+    convert: unitConvert,
   });
 }
 
