@@ -1541,8 +1541,8 @@ class TriangularDistribution extends ContinuousProbabilityDistribution {
   }
 
   _checkParameters(values) {
-    if (values.c<values.a) throw new Error("b has to be >=a");
-    if (values.b<values.c) throw new Error("c has to be >=b");
+    if (values.c<values.a) throw new Error("c has to be >=a");
+    if (values.b<values.c) throw new Error("b has to be >=c");
   }
 
   _getPDF(values, x) {
@@ -1588,6 +1588,98 @@ class TriangularDistribution extends ContinuousProbabilityDistribution {
     } else {
       return values.b-Math.sqrt(1-u)*factorRnd2;
     }
+  }
+}
+
+
+/**
+ * Sawtooth distribution (base class)
+ */
+class AbstractSawtoothDistribution extends ContinuousProbabilityDistribution {
+  /**
+    * Constructor
+    * @param {String} name Calculation function base name
+    * @param {String} displayName  Optional name to be displayed
+    */
+  constructor(name, displayName=null) {
+    super(name,displayName,false);
+    this._addContinuousParameter("a",null,false,null,false);
+    this._addContinuousParameter("b",null,false,null,false);
+  }
+
+  _checkParameters(values) {
+    if (values.b<values.a) throw new Error("b has to be >=a");
+  }
+
+  _getPDF(values, x) {
+    if (x<values.a || x>values.b) return 0;
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
+
+    return this._getPDFIntern(x,values.a,values.b);
+  }
+
+  _getCDF(values, x) {
+    if (x<values.a) return 0;
+    if (x>values.b) return 1;
+    if (values.a==values.b) return (x>=values.a)?1:0;
+
+    return this._getCDFIntern(x,values.a,values.b);
+  }
+}
+
+
+/**
+ * Left sawtooth distribution
+ */
+class SawtoothLeftDistribution extends AbstractSawtoothDistribution {
+  constructor() {
+    super("sawtoothleft",language.expressionBuilder.stochastics.distribution.sawtoothLeft);
+  }
+
+  _getPDFIntern(x, a, b) {
+    const twoDivBMinusASquare=2/((b-a)**2);
+    return twoDivBMinusASquare*(b-x);
+  }
+
+  _getCDFIntern(x, a, b) {
+    const oneDivBMinusASquare=1/((b-a)**2);
+    return 1-(b-x)**2*oneDivBMinusASquare;
+  }
+
+  _getRandomNumber(values) {
+    const u=Math.random();
+
+    if (values.a==values.b) return values.a;
+
+    return values.b-(values.b-values.a)*Math.sqrt(1-u);
+  }
+}
+
+
+/**
+ * Right sawtooth distribution
+ */
+class SawtoothRightDistribution extends AbstractSawtoothDistribution {
+  constructor() {
+    super("sawtoothright",language.expressionBuilder.stochastics.distribution.sawtoothRight);
+  }
+
+  _getPDFIntern(x, a, b) {
+    const twoDivBMinusASquare=2/((b-a)**2);
+    return twoDivBMinusASquare*(x-a);
+  }
+
+  _getCDFIntern(x, a, b) {
+    const oneDivBMinusASquare=1/((b-a)**2);
+    return (x-a)**2*oneDivBMinusASquare;
+  }
+
+  _getRandomNumber(values) {
+    const u=Math.random();
+
+    if (values.a==values.b) return values.a;
+
+    return values.a+(values.b-values.a)*Math.sqrt(u);
   }
 }
 
@@ -1940,6 +2032,8 @@ function getDistributions() {
     new StudentTDistribution(),
     new TrapezoidDistribution(),
     new TriangularDistribution(),
+    new SawtoothLeftDistribution(),
+    new SawtoothRightDistribution(),
     new UQuadraticDistribution(),
     new WeibullDistribution(),
     new WignerSemicircleDistribution(),
