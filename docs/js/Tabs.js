@@ -92,7 +92,7 @@ class Tabs {
     const langButton=document.createElement("button");
     divCollapse.appendChild(langButton);
     langButton.type="button";
-    langButton.className="btn btn-outline-light bi-globe btn-sm me-2";
+    langButton.className="btn btn-outline-light bi-globe btn-sm me-2 headerbutton";
     langButton.title=language.GUI.switchLanguageHint;
     langButton.onclick=()=>{
       localStorage.setItem('selectedLanguage',language.GUI.switchLanguageMode);
@@ -118,7 +118,7 @@ class Tabs {
     const colorButton=document.createElement("button");
     colorDiv.appendChild(colorButton);
     colorButton.type="button";
-    colorButton.className="btn btn-outline-light bi-sun btn-sm dropdown-toggle";
+    colorButton.className="btn btn-outline-light bi-sun btn-sm dropdown-toggle headerbutton";
     colorButton.dataset.bsToggle="dropdown";
     colorButton.title=language.GUI.tabColorMode;
     const colorUl=document.createElement("ul");
