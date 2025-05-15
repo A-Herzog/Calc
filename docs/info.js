@@ -52,12 +52,21 @@ function buildTree(parent, list) {
       ul.appendChild(li);
       li.data=entry;
       entry.li=li;
+      const table=document.createElement("table");
+      li.appendChild(table);
+      const tr=document.createElement("tr");
+      table.appendChild(tr);
+      let td;
+      tr.appendChild(td=document.createElement("td"));
+      td.style.verticalAlign="top";
       const marker=document.createElement("span");
-      li.appendChild(marker);
+      td.appendChild(marker);
       li.marker=marker;
+      tr.appendChild(td=document.createElement("td"));
+      td.style.verticalAlign="top";
       const span=document.createElement("span");
       span.innerHTML=entry.name;
-      li.appendChild(span);
+      td.appendChild(span);
       span.li=li;
       li.span=span;
       if (entry.list) {
