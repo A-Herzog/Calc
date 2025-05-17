@@ -81,6 +81,8 @@ function initConverter() {
 
   convertDataLength.push(...[
     {name: language.units.lengthMeters, unit: "m", initialValue: 1},
+    {name: language.units.lengthDecimeters, unit: "dm", factor: 1/10},
+    {name: language.units.lengthCentimeters, unit: "cm", factor: 1/100},
     {name: language.units.lengthMillimeters, unit: "mm", factor: 1/1000},
     {name: language.units.lengthKilometers, unit: "km", factor: 1000},
     {name: language.units.lengthMiles, unit: "miles", factor: 1609.344, wiki: language.units.lengthMiles},
