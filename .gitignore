@@ -1,7 +1,9 @@
+.storage
 .vscode
 .tmp
 bin
 dist
 Calculator.exe
+CalculatorSetup.exe
 Calculator_Linux_MacOS.zip
 desktop-app/2_Sign.bat

@@ -10,11 +10,11 @@ To use the calculator just go to
 
 ![Website status](https://img.shields.io/website?url=https%3A%2F%2Fa-herzog.github.io%2FCalc%2F)
 
-<!--
 You can also download the calculator as an offline usable Windows application:
 
-**[Calculator.exe](https://github.com/A-Herzog/Distributions/releases/latest/download/Calculator.exe)**
--->
+- [**Calculator.exe**](https://github.com/A-Herzog/Distributions/releases/latest/download/Calculator.exe) (Download & run)
+- [**Calculator_Linux_MacOS.zip**](https://github.com/A-Herzog/Distributions/releases/latest/download/Calculator_Linux_MacOS.zip)
+- [**CalculatorSetup.exe**](https://github.com/A-Herzog/Distributions/releases/latest/download/CalculatorSetup.exe) (for permanent installation - starts faster than the portable version)
 
 ## License
 

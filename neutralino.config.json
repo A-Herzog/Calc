@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
   "applicationId": "Calculator",
+  "applicationIcon": "/desktop-app/favicon.png",
   "version": "2.0.0",
   "defaultMode": "window",
   "port": 0,
@@ -45,7 +46,7 @@
     "binaryName": "Calculator",
     "resourcesPath": "/docs/",
     "clientLibrary": "docs/libs/neutralino.js",
-    "binaryVersion": "5.0.0",
-    "clientVersion": "5.0.1"
+    "binaryVersion": "6.0.0",
+    "clientVersion": "6.0.0"
   }
 }
