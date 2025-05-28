@@ -12,9 +12,9 @@ To use the calculator just go to
 
 You can also download the calculator as an offline usable Windows application:
 
-- [**Calculator.exe**](https://github.com/A-Herzog/Distributions/releases/latest/download/Calculator.exe) (Download & run)
-- [**Calculator_Linux_MacOS.zip**](https://github.com/A-Herzog/Distributions/releases/latest/download/Calculator_Linux_MacOS.zip)
-- [**CalculatorSetup.exe**](https://github.com/A-Herzog/Distributions/releases/latest/download/CalculatorSetup.exe) (for permanent installation - starts faster than the portable version)
+- [**Calculator.exe**](https://github.com/A-Herzog/Calc/releases/latest/download/Calculator.exe) (Download & run)
+- [**Calculator_Linux_MacOS.zip**](https://github.com/A-Herzog/Calc/releases/latest/download/Calculator_Linux_MacOS.zip)
+- [**CalculatorSetup.exe**](https://github.com/A-Herzog/Calc/releases/latest/download/CalculatorSetup.exe) (for permanent installation - starts faster than the portable version)
 
 ## License
 
