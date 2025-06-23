@@ -325,7 +325,8 @@ function loadMathJSExtensions() {
     binom: (n,k)=>binomDirect(n,k),
     binomial: (n,k)=>binomDirect(n,k),
     eye: n=>eye(n),
-    t: m=>math.transpose(m),
+    //t: m=>math.transpose(m),
+    // transpose([[1;2];[3;4]])
     sumx: sumX,
     prodx: prodX,
     integrate: integrate,

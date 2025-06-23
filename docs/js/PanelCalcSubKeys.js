@@ -127,7 +127,7 @@ class CalcPanelSubKeys extends CalcPanelSub {
     this.#addCalcButton(tr,"arg",language.calc.panelKeysArg);
     this.#addSeparator(tr);
     this.#addCalcButton(tr,"cross",language.calc.panelKeysCross);
-    this.#addCalcButton(tr,"t",language.calc.panelKeysT);
+    this.#addCalcButton(tr,"transpose",language.calc.panelKeysT);
     this.#addCalcButton(tr,"size",language.calc.panelKeysSize);
     this.#addCalcButton(tr,"inv",language.calc.panelKeysInv);
     this.#addCalcButton(tr,"det",language.calc.panelKeysDet);
