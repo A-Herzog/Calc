@@ -103,6 +103,8 @@ function initConverter() {
     {name: language.units.areaSquaremeters, unit: "m<sup>2</sup>", initialValue: 1, moreNames: ["m2","qm","m²"]},
     {name: language.units.areaSquaremillimeters, unit: "mm<sup>2</sup>", factor: 0.000001, moreNames: ["mm2","qmm","mm²"]},
     {name: language.units.areaSquarekilometers, unit: "km<sup>2</sup>", factor: 1000000, moreNames: ["km2","qkm","km²"]},
+    {name: language.units.areaSquareInch, unit: "in<sup>2</sup>", factor: 0.00064516, wiki: language.units.lengthInchWiki, moreNames: ["inch2","Zoll2", "inch²", "Zoll²"]},
+    {name: language.units.areaSquareFeet, unit: "ft<sup>2</sup>", factor: 0.092903, wiki: language.units.lengthFeetWiki},
     {name: language.units.areaHektar, unit: "ha", factor: 10000, wiki: language.units.areaHektarWiki},
     {name: language.units.areaAr, unit: "a", factor: 100, wiki: language.units.areaArWiki},
     {name: language.units.areaMorgen, unit: "mg", factor: 2500, wiki: language.units.areaMorgenWiki},
