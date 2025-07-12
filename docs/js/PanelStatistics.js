@@ -29,6 +29,9 @@ import {language} from './Language.js';
 class StatisticsPanel extends Panel {
   #input;
   #output;
+  #canvas;
+  #chart;
+  #xValues=[];
 
   constructor() {
     super();
@@ -54,6 +57,7 @@ class StatisticsPanel extends Panel {
     /* Characteristics */
     cardBody=this.#createCard(inner,language.statistics.Characteristics);
     this.#output=this._createDiv(cardBody);
+    this.#createCanvas(cardBody);
 
     /* Start */
     this.#update();
@@ -74,6 +78,50 @@ class StatisticsPanel extends Panel {
     body.className="card-body";
     return body;
   }
+
+  #createCanvas(parent) {
+    this.#canvas=document.createElement("canvas");
+    if (document.documentElement.dataset.bsTheme!='light') this.#canvas.style.backgroundColor="darkgray";
+    this.#canvas.classList.add("mt-3");
+
+    parent.appendChild(this.#canvas);
+    this.#chart=new Chart(this.#canvas, {
+      data: {labels: [],  datasets: [{type: 'line', label: '', data: [0]}]}, /* Dummy data on init needed; otherwise later updates will fail */
+      options: this.#getChartOptions()
+    });
+  }
+
+    #getChartOptions() {
+    return {
+      scales: {
+        x: {
+          title: {display: true, text: "x"},
+          ticks: {callback: (value, index, ticks)=>this.#xValues[index]} /* for some unknown reasons value and index returning the same number, so we have to get the actual value from the original array */
+        },
+        y : {
+          title: {display: true, text: language.statistics.frequency},
+          ticks: {callback: (value, index, ticks)=>formatNumber(value*100,1)+"%"}
+        }
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label=context.dataset.label || '';
+              if (label) label+=': ';
+              if (context.parsed.y!==null) label+=formatNumber(context.parsed.y*100,1)+"%";
+              return label;
+            }
+          }
+        }
+      },
+      animation: {duration: 0}
+    };
+  }
+
 
   #update() {
     /* Formulas */
@@ -150,6 +198,8 @@ class StatisticsPanel extends Panel {
       for (let level of [0.9, 0.95, 0.99]) output.push(language.statistics.confidenceInterval+" "+(level*100).toLocaleString()+"%: "+this.#getConfidenceInterval(numberCount,mean,sd,level));
     }
     this.#output.innerHTML=output.join("<br>");
+
+    this.#updateHistogram(arr);
   }
 
   #getConfidenceInterval(n, mean, sd, level) {
@@ -172,5 +222,73 @@ class StatisticsPanel extends Panel {
     }
 
     return (min+max)/2;
+  }
+
+  #maxHistogramSteps=20;
+
+  #updateHistogram(values) {
+    /* Prepare chart */
+    if (typeof(values)=='undefined' || !Array.isArray(values) || values.length<2) {
+      this.#canvas.style.display='none';
+      return;
+    }
+    this.#canvas.style.display='';
+
+    /* Calculate histogram */
+    let min=values.reduce((x,y)=>Math.min(x,y));
+    let max=values.reduce((x,y)=>Math.max(x,y));
+    const isDiscrete=values.filter(x=>x%1!=0).length==0;
+    let yValues;
+    if (isDiscrete) {
+      if (min>0 && min<=10) min=0;
+      if (max-min<=this.#maxHistogramSteps+1) {
+        /* Discrete, small range */
+        min=min-1;
+        max=max+1;
+        this.#xValues=Array.from({length: max-min+1}, (_,i)=>i+min);
+        yValues=Array.from({length: this.#xValues.length}, ()=>0);
+        for (let value of values) yValues[value-min]++;
+        yValues=yValues.map(x=>x/values.length);
+      } else {
+        /* Discrete, large range */
+        let step=1;
+        while ((max-min)/step>this.#maxHistogramSteps+1) step++;
+        min=min-step;
+        max=max+2*step;
+        const steps=Math.ceil((max-min)/step);
+        this.#xValues=Array.from({length: steps}, (_,i)=>"["+(min+i*step)+";"+(min+i*step+step-1)+"]");
+        yValues=Array.from({length: this.#xValues.length}, ()=>0);
+        for (let value of values) yValues[Math.floor((value-min)/step)]++;
+        yValues=yValues.map(x=>x/values.length);
+      }
+    } else {
+      /* Continuous values */
+        let step=1;
+        if (max-min<this.#maxHistogramSteps) {
+          console.log("A");
+          let mul=0;
+          while ((max-min)*step*(1+mul)<this.#maxHistogramSteps/2) mul+=0.1;
+          step=step*(1+mul);
+        } else {
+          console.log("B");
+          while ((max-min)/step>this.#maxHistogramSteps+1) step++;
+        }
+        console.log(step);
+        min=min-step;
+        max=max+2*step;
+        const steps=Math.ceil((max-min)/step);
+        this.#xValues=Array.from({length: steps}, (_,i)=>"["+formatNumber(min+i*step)+";"+formatNumber(min+(i+1)*step)+")");
+        yValues=Array.from({length: this.#xValues.length}, ()=>0);
+        for (let value of values) yValues[Math.floor((value-min)/step)]++;
+        yValues=yValues.map(x=>x/values.length);
+    }
+
+    /* Output histogram */
+    const data={
+      labels: this.#xValues,
+      datasets: [{type: 'bar', data: yValues, borderColor: 'red', backgroundColor: 'rgba(255,0,0,0.25)', borderWidth: 2}]
+    };
+    this.#chart.data=data;
+    this.#chart.update();
   }
 }

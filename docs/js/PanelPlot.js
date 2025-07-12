@@ -180,7 +180,6 @@ class PlotPanel extends Panel {
       tdRight.style.width="100px";
 
       tr.appendChild(tdRight);
-      let button;
       const input=nodes.input;
 
       /* Delete button */

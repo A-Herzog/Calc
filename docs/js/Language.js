@@ -363,6 +363,7 @@ lang.statistics.sd="Standardabweichung";
 lang.statistics.cv="Variationskoeffizient";
 lang.statistics.confidenceInterval="Konfidenzintervall zum Niveau";
 lang.statistics.confidenceIntervalRadius="Konfidenzradius";
+lang.statistics.frequency="Häufigkeit";
 
 lang.expressionBuilder={};
 lang.expressionBuilder.placeholderInfo="Wählen Sie einen Eintrag in der Baumstruktur auf der linken Seite aus, um Informationen zu dem jeweiligen Symbol angezeigt zu bekommen.";
@@ -1220,6 +1221,7 @@ lang.statistics.sd="Standard deviation";
 lang.statistics.cv="Coefficient of variation";
 lang.statistics.confidenceInterval="Confidence interval for level";
 lang.statistics.confidenceIntervalRadius="confidence radius";
+lang.statistics.frequency="Frequency";
 
 lang.expressionBuilder={};
 lang.expressionBuilder.placeholderInfo="Select an entry in the tree structure on the left-hand side to display information on the respective symbol.";
