@@ -18,6 +18,7 @@ export {StatisticsPanel};
 
 import {Panel} from './Panel.js';
 import {getFloat, formatNumber} from './NumberTools.js';
+import {preprocessInput, formatMathResult} from './MathJSTools.js';
 import {ibeta} from '../libs/jstat-special.js';
 import {language} from './Language.js';
 
@@ -27,6 +28,8 @@ import {language} from './Language.js';
  * @see Panel
  */
 class StatisticsPanel extends Panel {
+  #calc;
+  #errorInfo;
   #input;
   #output;
   #canvas;
@@ -44,17 +47,101 @@ class StatisticsPanel extends Panel {
     const inner=this._createDiv(outer);
     inner.className="row";
 
+    let col;
     let cardBody;
+    let line;
+    let button;
+    let tr, td;
+    let li;
+
+    /* Left column */
+    col=this.#createCol(inner);
+
+    /* Repeated calculation */
+    cardBody=this.#createCard(col,language.statistics.repeatedEvaluation,false);
+    line=this.#createLine(cardBody);
+    tr=this.#createTable(line);
+    tr.appendChild(td=document.createElement("td"));
+    this.#calc=this._createInput(td,false,language.calc.input);
+    tr.appendChild(td=document.createElement("td"));
+    td.style.width="1px";
+    button=this.#createButton(td,"","bi-code",language.calc.ExpressionBuilder,"primary",()=>{
+      if (isDesktopApp) {
+        Neutralino.storage.setData('selectSymbol',null).then(()=>{
+          Neutralino.storage.setData('returnID','100').then(()=>window.open("info_webapp.html"));
+        });
+      } else {
+        const popup=window.open("info.html");
+        setTimeout(()=>popup.postMessage("100"),1500);
+      }
+    });
+    if (isDesktopApp) setInterval(()=>{
+      Neutralino.storage.getData('selectSymbol').then(data=>{
+        Neutralino.storage.setData('selectSymbol',null);
+        this.#insertSymbol(data);
+      }).catch(()=>{});
+    },250);
+    window.addEventListener("message",event=>this.#insertSymbol(event.data));
+    button.style.marginLeft="5px";
+
+    line=this.#createLine(cardBody);
+    this.#errorInfo=this._createDiv(line);
+    this.#errorInfo.className="small";
+    this.#errorInfo.style.color="red";
+
+    line=this.#createLine(cardBody);
+   const div=document.createElement("div");
+   line.appendChild(div);
+   div.className="btn-group";
+   div.role="group";
+   this.#createButton(div,language.statistics.evaluate,"bi-calculator","","primary",()=>this.#runCalc(10000),false);
+   button=this.#createButton(div,"","","","primary",null);
+   button.classList.add("dropdown-toggle","dropdown-toggle-split");
+   button.dataset.bsToggle="dropdown";
+   button.ariaExpanded="false";
+   button.innerHTML='<span class="visually-hidden">Toggle Dropdown</span>';
+   const ul=document.createElement("ul");
+   div.appendChild(ul);
+   ul.className="dropdown-menu";
+   ul.appendChild(li=document.createElement("li"));
+   li.innerHTML='<span class="dropdown-item-text small">'+language.statistics.evaluateCount+'</span>';
+   ul.appendChild(li=document.createElement("li"));
+   li.innerHTML='<hr class="dropdown-divider">';
+   ul.appendChild(li=document.createElement("li"));
+   li.appendChild(button=document.createElement("button"));
+   button.type="button";
+   button.className="dropdown-item";
+   button.innerHTML=language.statistics.evaluateCountFew+" ("+(new Number(1000).toLocaleString())+")";
+   button.onclick=()=>this.#runCalc(1000);
+   li.appendChild(button=document.createElement("button"));
+   button.type="button";
+   button.className="dropdown-item";
+   button.innerHTML="<b>"+language.statistics.evaluateCountMore+" ("+(new Number(10000).toLocaleString())+")</b>";
+   button.onclick=()=>this.#runCalc(10000);
+   li.appendChild(button=document.createElement("button"));
+   button.type="button";
+   button.className="dropdown-item";
+   button.innerHTML=language.statistics.evaluateCountMany+" ("+(new Number(100000).toLocaleString())+")";
+   button.onclick=()=>this.#runCalc(100000);
+   li.appendChild(button=document.createElement("button"));
+   button.type="button";
+   button.className="dropdown-item";
+   button.innerHTML=language.statistics.evaluateCountVeryMany+" ("+(new Number(200000).toLocaleString())+")";
+   button.onclick=()=>this.#runCalc(200000);
 
     /* Input values */
-    cardBody=this.#createCard(inner,language.statistics.MeasuredValues);
+    cardBody=this.#createCard(col,language.statistics.MeasuredValues,false);
+    line=this.#createLine(cardBody);
+    line.className="mb-2";
+    button=this.#createButton(line,language.statistics.clear,"bi-trash","","danger",()=>this.#input.value="");
+
     cardBody.appendChild(this.#input=document.createElement("textarea"));
     this.#input.className="form-control";
     this.#input.rows="20";
     this.#input.placeholder=language.statistics.MeasuredValuesInfo;
     this.#input.oninput=()=>this.#update();
 
-    /* Characteristics */
+    /* Right column: Characteristics */
     cardBody=this.#createCard(inner,language.statistics.Characteristics);
     this.#output=this._createDiv(cardBody);
     this.#createCanvas(cardBody);
@@ -63,11 +150,29 @@ class StatisticsPanel extends Panel {
     this.#update();
   }
 
-  #createCard(parent, title) {
+  #insertSymbol(jsonString) {
+    const json=JSON.parse(jsonString);
+    if (json.ID!=100) return;
+    const str=this.#calc.value;
+    const caret=this.#calc.selectionStart;
+    this.#calc.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+  }
+
+  #createCol(parent) {
     const col=this._createDiv(parent);
     col.className="col-md-6";
+    return col;
+  }
 
-    const card=this._createDiv(col);
+  #createCard(parent, title, createCol=true) {
+    let cardParent;
+    if (createCol) {
+      cardParent=this.#createCol(parent);
+    } else {
+      cardParent=parent;
+    }
+
+    const card=this._createDiv(cardParent);
     card.className="card mb-3";
 
     const header=this._createDiv(card);
@@ -77,6 +182,55 @@ class StatisticsPanel extends Panel {
     const body=this._createDiv(card);
     body.className="card-body";
     return body;
+  }
+
+  #createLine(parent) {
+    const line=this._createDiv(parent);
+    line.style.padding="5px";
+    return line;
+  }
+
+  #createTable(parent) {
+    const table=document.createElement("table");
+    table.style.width="100%";
+    parent.appendChild(table);
+    const tr=document.createElement("tr");
+    table.appendChild(tr);
+    return tr;
+  }
+
+  #createButton(parent, text, icon, tooltip, color, onclick, margin=true) {
+    const button=document.createElement("button");
+    button.type="button";
+    button.className=(margin?"me-2 ":"")+"mb-1 btn btn-sm btn-"+color+((icon!='')?" ":"")+icon;
+    button.innerHTML=((text!='' && icon!='')?"&nbsp;":"")+text;
+    if (tooltip!='') button.title=tooltip;
+    if (onclick!=null) button.onclick=onclick;
+    parent.appendChild(button);
+    return button;
+  }
+
+  #runCalc(repeatCount) {
+    try {
+      const text=preprocessInput(this.#calc.value);
+      const expression=math.compile(text);
+      const results=[];
+      for (let i=0;i<repeatCount;i++) {
+        results.push(formatMathResult(expression.evaluate()));
+      }
+      this.#input.value=results.join("\n");
+      this.#showError();
+    } catch (e) {
+      this.#input.value="";
+      this.#showError(e.message);
+    }
+    this.#update();
+  }
+
+  #showError(msg='') {
+    this.#errorInfo.innerHTML=msg;
+    this.#errorInfo.style.display=(msg=='')?"none":"";
+    this.#calc.classList.toggle("is-invalid",msg!='');
   }
 
   #createCanvas(parent) {
@@ -121,7 +275,6 @@ class StatisticsPanel extends Panel {
       animation: {duration: 0}
     };
   }
-
 
   #update() {
     /* Formulas */

@@ -72,11 +72,11 @@ class CalcPanel extends Panel {
       }
     });
     if (isDesktopApp) setInterval(()=>{
-        Neutralino.storage.getData('selectSymbol').then(data=>{
-          Neutralino.storage.setData('selectSymbol',null);
-          this.#insertSymbol(data);
-        }).catch(()=>{});
-      },250);
+      Neutralino.storage.getData('selectSymbol').then(data=>{
+        Neutralino.storage.setData('selectSymbol',null);
+        this.#insertSymbol(data);
+      }).catch(()=>{});
+    },250);
 
     window.addEventListener("message",event=>this.#insertSymbol(event.data));
     button.classList.add("bi-code");
