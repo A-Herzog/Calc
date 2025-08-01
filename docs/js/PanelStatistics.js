@@ -30,6 +30,7 @@ import {language} from './Language.js';
 class StatisticsPanel extends Panel {
   #calc;
   #errorInfo;
+  #inputCard;
   #input;
   #output;
   #canvas;
@@ -90,56 +91,61 @@ class StatisticsPanel extends Panel {
     this.#errorInfo.style.color="red";
 
     line=this.#createLine(cardBody);
-   const div=document.createElement("div");
-   line.appendChild(div);
-   div.className="btn-group";
-   div.role="group";
-   this.#createButton(div,language.statistics.evaluate,"bi-calculator","","primary",()=>this.#runCalc(10000),false);
-   button=this.#createButton(div,"","","","primary",null);
-   button.classList.add("dropdown-toggle","dropdown-toggle-split");
-   button.dataset.bsToggle="dropdown";
-   button.ariaExpanded="false";
-   button.innerHTML='<span class="visually-hidden">Toggle Dropdown</span>';
-   const ul=document.createElement("ul");
-   div.appendChild(ul);
-   ul.className="dropdown-menu";
-   ul.appendChild(li=document.createElement("li"));
-   li.innerHTML='<span class="dropdown-item-text small">'+language.statistics.evaluateCount+'</span>';
-   ul.appendChild(li=document.createElement("li"));
-   li.innerHTML='<hr class="dropdown-divider">';
-   ul.appendChild(li=document.createElement("li"));
-   li.appendChild(button=document.createElement("button"));
-   button.type="button";
-   button.className="dropdown-item";
-   button.innerHTML=language.statistics.evaluateCountFew+" ("+(new Number(1000).toLocaleString())+")";
-   button.onclick=()=>this.#runCalc(1000);
-   li.appendChild(button=document.createElement("button"));
-   button.type="button";
-   button.className="dropdown-item";
-   button.innerHTML="<b>"+language.statistics.evaluateCountMore+" ("+(new Number(10000).toLocaleString())+")</b>";
-   button.onclick=()=>this.#runCalc(10000);
-   li.appendChild(button=document.createElement("button"));
-   button.type="button";
-   button.className="dropdown-item";
-   button.innerHTML=language.statistics.evaluateCountMany+" ("+(new Number(100000).toLocaleString())+")";
-   button.onclick=()=>this.#runCalc(100000);
-   li.appendChild(button=document.createElement("button"));
-   button.type="button";
-   button.className="dropdown-item";
-   button.innerHTML=language.statistics.evaluateCountVeryMany+" ("+(new Number(200000).toLocaleString())+")";
-   button.onclick=()=>this.#runCalc(200000);
+    const div=document.createElement("div");
+    line.appendChild(div);
+    div.className="btn-group";
+    div.role="group";
+    this.#createButton(div,language.statistics.evaluate,"bi-calculator","","primary",()=>this.#runCalc(10000),false);
+    button=this.#createButton(div,"","","","primary",null);
+    button.classList.add("dropdown-toggle","dropdown-toggle-split");
+    button.dataset.bsToggle="dropdown";
+    button.ariaExpanded="false";
+    button.innerHTML='<span class="visually-hidden">Toggle Dropdown</span>';
+    const ul=document.createElement("ul");
+    div.appendChild(ul);
+    ul.className="dropdown-menu";
+    ul.appendChild(li=document.createElement("li"));
+    li.innerHTML='<span class="dropdown-item-text small">'+language.statistics.evaluateCount+'</span>';
+    ul.appendChild(li=document.createElement("li"));
+    li.innerHTML='<hr class="dropdown-divider">';
+    ul.appendChild(li=document.createElement("li"));
+    li.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="dropdown-item";
+    button.innerHTML=language.statistics.evaluateCountFew+" ("+(new Number(1000).toLocaleString())+")";
+    button.onclick=()=>this.#runCalc(1000);
+    li.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="dropdown-item";
+    button.innerHTML="<b>"+language.statistics.evaluateCountMore+" ("+(new Number(10000).toLocaleString())+")</b>";
+    button.onclick=()=>this.#runCalc(10000);
+    li.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="dropdown-item";
+    button.innerHTML=language.statistics.evaluateCountMany+" ("+(new Number(100000).toLocaleString())+")";
+    button.onclick=()=>this.#runCalc(100000);
+    li.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="dropdown-item";
+    button.innerHTML=language.statistics.evaluateCountVeryMany+" ("+(new Number(200000).toLocaleString())+")";
+    button.onclick=()=>this.#runCalc(200000);
 
     /* Input values */
-    cardBody=this.#createCard(col,language.statistics.MeasuredValues,false);
-    line=this.#createLine(cardBody);
+    this.#inputCard=this.#createCard(col,language.statistics.MeasuredValues,false);
+    line=this.#createLine(this.#inputCard);
     line.className="mb-2";
     button=this.#createButton(line,language.statistics.clear,"bi-trash","","danger",()=>this.#input.value="");
 
-    cardBody.appendChild(this.#input=document.createElement("textarea"));
+    this.#inputCard.appendChild(this.#input=document.createElement("textarea"));
     this.#input.className="form-control";
     this.#input.rows="20";
     this.#input.placeholder=language.statistics.MeasuredValuesInfo;
     this.#input.oninput=()=>this.#update();
+
+    this.#inputCard.ondragenter=e=>this.#inputValuesDrag(e);
+    this.#inputCard.ondragleave=e=>this.#inputValuesDrag(e);
+    this.#inputCard.ondragover=e=>this.#inputValuesDrag(e);
+    this.#inputCard.ondrop=e=>this.#inputValuesDrag(e);
 
     /* Right column: Characteristics */
     cardBody=this.#createCard(inner,language.statistics.Characteristics);
@@ -148,6 +154,45 @@ class StatisticsPanel extends Panel {
 
     /* Start */
     this.#update();
+  }
+
+  #dragEnterCount=0;
+
+  /**
+ * Handles drag and drop events for loading input values.
+ * @param {Object} ev Drag and drop events
+ */
+  #inputValuesDrag(ev) {
+    if (ev.type=='dragenter') {
+      this.#inputCard.style.border="3px dashed green";
+      this.#dragEnterCount++;
+      return;
+    }
+
+    if (ev.type=='dragleave') {
+      if (this.#dragEnterCount>0) this.#dragEnterCount--;
+      if (this.#dragEnterCount>0) return;
+      this.#inputCard.style.border="";
+      return;
+    }
+
+    if (ev.type=='dragover') {
+      ev.preventDefault();
+      return;
+    }
+
+    if (ev.type=='drop') {
+      ev.preventDefault();
+      this.#dragEnterCount=0;
+      this.#inputCard.style.border="";
+      if (typeof(ev.dataTransfer)=='undefined' || ev.dataTransfer==null) return;
+      if (typeof(ev.dataTransfer.files)=='undefined' || ev.dataTransfer.files.length!=1) return;
+      ev.dataTransfer.files[0].text().then(response=>{
+        this.#input.value=response.trim();
+        this.#update();
+      });
+      return;
+    }
   }
 
   #insertSymbol(jsonString) {
@@ -418,15 +463,12 @@ class StatisticsPanel extends Panel {
       /* Continuous values */
         let step=1;
         if (max-min<this.#maxHistogramSteps) {
-          console.log("A");
           let mul=0;
           while ((max-min)*step*(1+mul)<this.#maxHistogramSteps/2) mul+=0.1;
           step=step*(1+mul);
         } else {
-          console.log("B");
           while ((max-min)/step>this.#maxHistogramSteps+1) step++;
         }
-        console.log(step);
         min=min-step;
         max=max+2*step;
         const steps=Math.ceil((max-min)/step);

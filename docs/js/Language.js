@@ -344,7 +344,7 @@ lang.units.angleFullCircle="Vollwinkel";
 
 lang.statistics={};
 lang.statistics.MeasuredValues="Messwerte";
-lang.statistics.MeasuredValuesInfo="Eine Zahl pro Zeilen hier eingeben";
+lang.statistics.MeasuredValuesInfo="Eine oder mehrere durch \";\" getrennte Zahlen pro Zeilen hier eingeben.\nJede Zeile wird als ein Messwert betrachtet.\nEs können auch leere Zeilen vorhanden sein, die dann nicht in die Statistik einfließen.\nDateien können zum Laden per Drag&Drop in das Eingabefeld gezogen werden.";
 lang.statistics.Characteristics="Kenngrößen";
 lang.statistics.countLines="Anzahl an Zeilen insgesamt";
 lang.statistics.countEmpty="Anzahl an leeren Zeilen";
@@ -1210,7 +1210,7 @@ lang.units.angleFullCircle="Full angle";
 
 lang.statistics={};
 lang.statistics.MeasuredValues="Measured values";
-lang.statistics.MeasuredValuesInfo="Input one number per line here";
+lang.statistics.MeasuredValuesInfo="Enter one or more numbers separated by \";\" per line here.\nEach number is regarded as a measured value.\nThere may also be empty lines, which are then not included in the statistics.\nFiles can be dragged and dropped into the input field for loading.";
 lang.statistics.Characteristics="Characteristics";
 lang.statistics.countLines="Number of lines in total";
 lang.statistics.countEmpty="Number of empty lines";
