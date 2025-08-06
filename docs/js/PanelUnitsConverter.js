@@ -62,6 +62,7 @@ const convertDataTemperature=[];
 const convertDataPressure=[];
 const convertDataWeightAndMass=[];
 const convertDataAngle=[];
+const convertDataTime=[];
 
 const convertDataAll=[
   convertDataLength,
@@ -73,7 +74,8 @@ const convertDataAll=[
   convertDataTemperature,
   convertDataPressure,
   convertDataWeightAndMass,
-  convertDataAngle
+  convertDataAngle,
+  convertDataTime
 ];
 
 function initConverter() {
@@ -95,6 +97,7 @@ function initConverter() {
     {name: language.units.lengthParsec, unit: "pc", factor: 3.09E16, wiki: language.units.lengthParsecWiki},
     {name: language.units.lengthAE, unit: "AE", factor: 149597870700, wiki: language.units.lengthAEWiki},
     {name: language.units.lengthLightSeconds, factor: 299792458, wiki: language.units.lengthLightSecondsWiki},
+    {name: language.units.lengthLightYears, factor: 299792458*86400*365.2425, wiki: language.units.lengthLightYearsWiki},
     {name: language.units.lengthKlafter, factor: 0.3048*6, wiki: language.units.lengthKlafterWiki},
     {name: language.units.lengthLachter, unit: "Ltr", factor: 1.9238, wiki: language.units.lengthLachterWiki, info: language.units.lengthLachterInfo}
   ]);
@@ -186,6 +189,27 @@ function initConverter() {
     {name: language.units.angleGON, unit: "gon", factor: 360/400, wiki: language.units.angleGONWiki, moreNames: ["GRAD"]},
     {name: language.units.angleFullCircle, factor: 360}
   ]);
+
+  convertDataTime.push(...[
+    {name: language.units.timeSeconds, unit: "s", initialValue: 1, moreNames: ["Second","Sekunde","sec"]},
+    {name: language.units.timeMinutes, unit: "min", factor: 60, moreNames: ["Minute","min"]},
+    {name: language.units.timeHours, unit: "h", factor: 3600, moreNames: ["Hour","Stunde","Std"]},
+    {name: language.units.timeDays, unit: "d", factor: 86400, moreNames: ["Day","Tag"]},
+    {name: language.units.timeWeeks, unit: "w", factor: 604800, moreNames: ["Week","Woche"]},
+    {name: language.units.timeYears, unit: "a", factor: 86400*365.2425, moreNames: ["Year","Jahr"]},
+    {name: language.units.timeDecades, unit: "dec", factor: 86400*365.2425*10, moreNames: ["Decade","Jahrzehnt"]},
+    {name: language.units.timeCenturies, unit: "cent", factor: 86400*365.2425*100, moreNames: ["Century","Jahrhundert"]},
+    {name: language.units.timeMillennia, unit: "mill", factor: 86400*365.2425*1000, moreNames: ["Millennia","Jahrtausend"]},
+    {name: language.units.timeMilliSeconds, unit: "ms", calcToBase: x=>x/1E3, calcFromBase: x=>x*1E3, moreNames: ["Millisecond","Millisekunde"]},
+    {name: language.units.timeMicroSeconds, unit: "µs", calcToBase: x=>x/1E6, calcFromBase: x=>x*1E6, moreNames: ["Microsecond","Mikrosekunde"]},
+    {name: language.units.timeNanoSeconds, unit: "ns", calcToBase: x=>x/1E9, calcFromBase: x=>x*1E9, moreNames: ["Nanosecond","Nanosekunde"]},
+    {name: language.units.timePicoSeconds, unit: "ps", calcToBase: x=>x/1E12, calcFromBase: x=>x*1E12, moreNames: ["Picosecond","Pikosekunde"]},
+    {name: language.units.timeFemtoSeconds, unit: "fs", calcToBase: x=>x/1E15, calcFromBase: x=>x*1E15, moreNames: ["Femtosecond","Femtosekunde"]},
+    {name: language.units.timeAttoSeconds, unit: "as", calcToBase: x=>x/1E18, calcFromBase: x=>x*1E18, moreNames: ["Attosecond","Attosekunde"]},
+    {name: language.units.timeZeptoSeconds, unit: "zs", calcToBase: x=>x/1E21, calcFromBase: x=>x*1E21, moreNames: ["Zeptosecond","Zeptosekunde"]},
+    {name: language.units.timeYoctoSeconds, unit: "ys", calcToBase: x=>x/1E24, calcFromBase: x=>x*1E24, moreNames: ["Yoctosecond","Yoctosekunde"]}
+  ]);
+
 }
 
 function convertValue(value, oldUnit, newUnit) {
@@ -249,6 +273,7 @@ class UnitsConverterPanel extends Panel {
     this.#buildUnitsPanel(language.units.pressure,convertDataPressure);
     this.#buildUnitsPanel(language.units.WeightAndMass,convertDataWeightAndMass);
     this.#buildUnitsPanel(language.units.angle,convertDataAngle);
+    this.#buildUnitsPanel(language.units.time,convertDataTime);
 
     /* Start */
     this.#selectPanel();
