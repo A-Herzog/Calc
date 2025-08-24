@@ -818,6 +818,10 @@ lang.expressionBuilder.stochastics.distribution.frechet="Frechet-Verteilung";
 lang.expressionBuilder.stochastics.distribution.logCauchy="Log-Cauchy-Verteilung";
 lang.expressionBuilder.stochastics.distribution.power="Potenzverteilung";
 lang.expressionBuilder.stochastics.distribution.rayleigh="Rayleigh-Verteilung";
+lang.expressionBuilder.stochastics.distribution.cosine="Cosinus-Verteilung";
+lang.expressionBuilder.stochastics.distribution.logGamma="Log-Gamma-Verteilung";
+lang.expressionBuilder.stochastics.distribution.inverseGamma="Inverse Gamma-Verteilung";
+lang.expressionBuilder.stochastics.distribution.continuousBernoulli="Kontinuierliche Bernoulli-Verteilung";
 
 lang.expressionBuilder.logic={};
 lang.expressionBuilder.logic.name="Logikfunktionen";
@@ -1704,6 +1708,10 @@ lang.expressionBuilder.stochastics.distribution.frechet="Frechet distribution";
 lang.expressionBuilder.stochastics.distribution.logCauchy="Log-Cauchy distribution";
 lang.expressionBuilder.stochastics.distribution.power="Power distribution";
 lang.expressionBuilder.stochastics.distribution.rayleigh="Rayleigh distribution";
+lang.expressionBuilder.stochastics.distribution.cosine="Cosinus distribution";
+lang.expressionBuilder.stochastics.distribution.logGamma="Log-Gamma distribution";
+lang.expressionBuilder.stochastics.distribution.inverseGamma="Inverse gamma distribution";
+lang.expressionBuilder.stochastics.distribution.continuousBernoulli="Continuous Bernoulli distribution";
 
 lang.expressionBuilder.logic={};
 lang.expressionBuilder.logic.name="Logic functions";

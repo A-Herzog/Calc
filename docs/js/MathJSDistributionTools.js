@@ -683,12 +683,14 @@ class ArcsineDistribution extends ContinuousProbabilityDistribution {
   }
 
   _getPDF(values, x) {
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
     x=(x-values.a)/(values.b-values.a);
     if (x<=0 || x>=1) return 0;
-     return 1/(Math.PI*Math.sqrt(x*(1-x)));
+     return 1/(Math.PI*Math.sqrt(x*(1-x)))/(values.b-values.a);
   }
 
   _getCDF(values, x) {
+    if (values.a==values.b) return (x<values.a)?0:1;
     x=(x-values.a)/(values.b-values.a);
     if (x<=0) return 0;
     if (x>=1) return 1;
@@ -735,7 +737,7 @@ class BetaDistribution extends ContinuousProbabilityDistribution {
     }
 
     x=(x-values.a)/(values.b-values.a);
-    return x**(values.alpha-1)*(1-x)**(values.beta-1)*this.#pdfFactor;
+    return x**(values.alpha-1)*(1-x)**(values.beta-1)*this.#pdfFactor/(values.b-values.a);
   }
 
   _getCDF(values, x) {
@@ -1410,12 +1412,14 @@ class SineDistribution extends ContinuousProbabilityDistribution {
   }
 
   _getPDF(values, x) {
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
     x=(x-values.a)/(values.b-values.a);
     if (x<=0 || x>=1) return 0;
-    return Math.PI/2*Math.sin(Math.PI*x);
+    return Math.PI/2*Math.sin(Math.PI*x)/(values.b-values.a);
   }
 
   _getCDF(values, x) {
+    if (values.a==values.b) return (x<values.a)?0:1;
     x=(x-values.a)/(values.b-values.a);
     if (x<=0) return 0;
     if (x>=1) return 1;
@@ -1974,6 +1978,116 @@ class RayleighDistribution extends ContinuousProbabilityDistribution {
 }
 
 
+/**
+ * Cosine distribution
+ */
+class CosineDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("cosine",language.expressionBuilder.stochastics.distribution.cosine);
+    this._addContinuousParameter("a",null,false,null,false);
+    this._addContinuousParameter("b",null,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
+    if (x<values.a || x>values.b) return 0;
+		return 1/(values.b-values.a)*(1+Math.cos(2*Math.PI*(x-values.a)/(values.b-values.a)-Math.PI));
+  }
+
+  _getCDF(values, x) {
+    if (values.a==values.b) return (x>=values.a)?1:0;
+    if (x<values.a) return 0;
+    if (x>values.b) return 1;
+    return 1/(2*Math.PI*(values.b-values.a))*(2*Math.PI*(x-values.a)-(values.b-values.a)*Math.sin(2*Math.PI*(x-values.a)/(values.b-values.a)));
+  }
+}
+
+
+/**
+ * Logarithmic gamma distribution
+ */
+class LogGammaDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("loggamma",language.expressionBuilder.stochastics.distribution.logGamma);
+    this._addContinuousParameter("a",0,false,null,false);
+    this._addContinuousParameter("b",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<1) return 0;
+    const pdfFactor=(values.b**values.a)/gammafn(values.a);
+    return pdfFactor*Math.pow(x,-(values.b+1))*Math.pow(Math.log(x),values.a-1);
+  }
+
+  _getCDF(values, x) {
+    if (x<1) return 0;
+    const cdfFactor=1/gammafn(values.a);
+    return cdfFactor*gammap(values.a,values.b*Math.log(x));
+  }
+}
+
+
+/**
+ * Inverse gamma distribution
+ */
+class InverseGammaDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("invgamma",language.expressionBuilder.stochastics.distribution.inverseGamma);
+    this._addContinuousParameter("alpha",0,false,null,false);
+    this._addContinuousParameter("beta",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<=0) return 0;
+    const pdfFactor=Math.pow(values.beta,values.alpha)/gammafn(values.alpha);
+    return pdfFactor*Math.pow(x,-values.alpha-1)*Math.exp(-values.beta/x);
+  }
+
+  _getCDF(values, x) {
+    if (x<=0) return 0;
+
+    const lowerIncompleteGamma=gammap(values.alpha,values.beta/x);
+    const gamma=gammafn(values.alpha);
+    const upperIncompleteGamma=gamma-lowerIncompleteGamma;
+    return upperIncompleteGamma/gamma;
+  }
+}
+
+
+/**
+ * Continuous Bernoulli distribution
+ */
+class ContinuousBernoulliDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("continuousbernoulli",language.expressionBuilder.stochastics.distribution.continuousBernoulli);
+    this._addContinuousParameter("a",null,false,null,false,5);
+    this._addContinuousParameter("b",null,false,null,false,10);
+    this._addContinuousParameter("lambda",0,false,1,false,0.3);
+  }
+
+  _getPDF(values, x) {
+    if (values.a==values.b) return (x==values.a)?Infinity:0;
+    if (x<values.a || x>values.b) return 0;
+
+    x=(x-values.a)/(values.b-values.a);
+    const Clambda=(values.lambda==0.5)?2:(2*Math.atanh(1-2*values.lambda)/(1-2*values.lambda));
+		return (Clambda*Math.pow(values.lambda,x)*Math.pow(1-values.lambda,1-x))/(values.b-values.a);
+  }
+
+  _getCDF(values, x) {
+    if (values.a==values.b) return (x>=values.a)?1:0;
+    if (x<values.a) return 0;
+    if (x>values.b) return 1;
+
+    x=(x-values.a)/(values.b-values.a);
+    if (values.lambda==0.5) return x;
+
+    const cdfFactor=(values.lambda==0.5)?1:(1/(2*values.lambda-1));
+		return cdfFactor*(Math.pow(values.lambda,x)*Math.pow(1-values.lambda,1-x)+values.lambda-1);
+  }
+}
+
+
 /* ============================================================================
  * Setup
  * ============================================================================ */
@@ -2041,7 +2155,11 @@ function getDistributions() {
     new FrechetDistribution(),
     new LogCauchyDistribution(),
     new PowerDistribution(),
-    new RayleighDistribution()
+    new RayleighDistribution(),
+    new CosineDistribution(),
+    new LogGammaDistribution(),
+    new InverseGammaDistribution(),
+    new ContinuousBernoulliDistribution()
   ];
 
   return distributions;
