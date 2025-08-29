@@ -463,10 +463,14 @@ class StatisticsPanel extends Panel {
       /* Continuous values */
         let step=1;
         if (max-min<this.#maxHistogramSteps) {
-          let mul=0;
-          while ((max-min)*step*(1+mul)<this.#maxHistogramSteps/2) mul+=0.1;
-          step=step*(1+mul);
+          if (max-min<this.#maxHistogramSteps/2.2) {
+            let mul=0;
+            while ((max-min)*step*(1+mul)<this.#maxHistogramSteps/2) mul+=0.1;
+            step=step/(1+mul);
+          }
         } else {
+          min=Math.floor(min);
+          max=Math.ceil(max);
           while ((max-min)/step>this.#maxHistogramSteps+1) step++;
         }
         min=min-step;
