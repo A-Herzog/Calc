@@ -67,11 +67,12 @@ function eye(n) {
  */
 function preprocessMultiFunction(name, params) {
   /* Test number of parameters */
-  if (params.length<3 || params.length>4) throw new Error(name+" needs 3 or 4 paramerers.");
+  if (params.length<3 || params.length>4) throw new Error(name+" needs 3 or 4 parameters.");
 
   /* Term parameter */
   if (typeof(params[0])!='string') throw new Error("First parameter of "+name+" has to be a string.");
-  const term=math.compile(params[0]);
+  const termString=params[0];
+  const term=math.compile(termString);
 
   /* Variable, min and max */
   let variable='x';
@@ -89,7 +90,7 @@ function preprocessMultiFunction(name, params) {
   if (typeof(min)!='number' || typeof(max)!='number') throw new Error("The last 2 parameters of "+name+" have to be numbers.");
   if (min>max) throw new Error("The last parameter of "+name+" cannot be smaller than the parameter before.");
 
-  return {term: term, variable: variable, min: min, max: max};
+  return {term: term, termString: termString, variable: variable, min: min, max: max};
 }
 
 /**
@@ -100,13 +101,50 @@ function preprocessMultiFunction(name, params) {
 function sumX(...params) {
   const expr=preprocessMultiFunction("sumx",params);
 
-  let sum=0;
-  for (let i=expr.min;i<=expr.max;i++) {
-    const scope={};
-    scope[expr.variable]=i;
-    sum+=expr.term.evaluate(scope);
+  const variable=expr.variable;
+  const term=expr.term;
+  const min=expr.min;
+  const max=expr.max;
+
+  /* If the term does not contain the variable, we can calculate it only once */
+  if (expr.termString.indexOf(variable)<0) {
+    const value=term.evaluate();
+    return value*(max-min+1);
   }
 
+  /* If the term is just the variable, we can use the formula for the sum of the first n integers */
+  if (expr.termString==variable) {
+    return (max-min+1)*(min+max)/2;
+  }
+
+  /* Sum of the square roots of a range of integers */
+  if (expr.termString=='sqrt('+variable+')') {
+    let sum=0;
+    for (let i=min;i<=max;i++) sum+=Math.sqrt(i);
+    return sum;
+  }
+
+  /* Sum of the absolute values of a range of integers */
+  if (expr.termString=='sqrt('+variable+'^2)' || expr.termString=='abs('+variable+')') {
+    let sum=0;
+    for (let i=min;i<=max;i++) sum+=Math.abs(i);
+    return sum;
+  }
+
+  /* Sum of the square roots of a range of squares plus one */
+  if (expr.termString=='sqrt('+variable+'^2+1)') {
+    let sum=0;
+    for (let i=min;i<=max;i++) sum+=Math.sqrt(i**2+1);
+    return sum;
+  }
+
+  /* If the term contains the variable, we have to evaluate it for each value */
+  let sum=0;
+  const scope={};
+  for (let i=min;i<=max;i++) {
+    scope[variable]=i;
+    sum+=term.evaluate(scope);
+  }
   return sum;
 }
 
@@ -116,13 +154,25 @@ function sumX(...params) {
  * @returns Product
  */
 function prodX(...params) {
-  const expr=preprocessMultiFunction("sumx",params);
+  const expr=preprocessMultiFunction("prodx",params);
 
+  const variable=expr.variable;
+  const term=expr.term;
+  const min=expr.min;
+  const max=expr.max;
+
+  /* If the term does not contain the variable, we can calculate it only once */
+  if (expr.termString.indexOf(variable)<0) {
+    const value=term.evaluate();
+    return value**(max-min+1);
+  }
+
+  /* If the term contains the variable, we have to evaluate it for each value */
   let prod=1;
-  for (let i=expr.min;i<=expr.max;i++) {
-    const scope={};
-    scope[expr.variable]=i;
-    prod*=expr.term.evaluate(scope);
+  const scope={};
+  for (let i=min;i<=max;i++) {
+    scope[variable]=i;
+    prod*=term.evaluate(scope);
   }
 
   return prod;
@@ -134,7 +184,7 @@ function prodX(...params) {
  * @returns Integral value
  */
 function integrate(...params) {
-  const expr=preprocessMultiFunction("sumx",params);
+  const expr=preprocessMultiFunction("integrate",params);
 
   const STEPS=2**18+1; /* Must be multiple of 4 plus 1 */
 
@@ -325,8 +375,7 @@ function loadMathJSExtensions() {
     binom: (n,k)=>binomDirect(n,k),
     binomial: (n,k)=>binomDirect(n,k),
     eye: n=>eye(n),
-    //t: m=>math.transpose(m),
-    // transpose([[1;2];[3;4]])
+    /* t: m=>math.transpose(m), transpose([[1;2];[3;4]]) */
     sumx: sumX,
     prodx: prodX,
     integrate: integrate,
