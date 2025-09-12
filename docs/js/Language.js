@@ -822,6 +822,10 @@ lang.expressionBuilder.stochastics.distribution.cosine="Cosinus-Verteilung";
 lang.expressionBuilder.stochastics.distribution.logGamma="Log-Gamma-Verteilung";
 lang.expressionBuilder.stochastics.distribution.inverseGamma="Inverse Gamma-Verteilung";
 lang.expressionBuilder.stochastics.distribution.continuousBernoulli="Kontinuierliche Bernoulli-Verteilung";
+lang.expressionBuilder.stochastics.distribution.planck="Planck-Verteilung";
+lang.expressionBuilder.stochastics.distribution.halfCauchy="Halbe Cauchy-Verteilung";
+lang.expressionBuilder.stochastics.distribution.logLaplace="Log-Laplace-Verteilung";
+lang.expressionBuilder.stochastics.distribution.boltzmann="Boltzmann-Verteilung";
 
 lang.expressionBuilder.logic={};
 lang.expressionBuilder.logic.name="Logikfunktionen";
@@ -1712,6 +1716,10 @@ lang.expressionBuilder.stochastics.distribution.cosine="Cosinus distribution";
 lang.expressionBuilder.stochastics.distribution.logGamma="Log-Gamma distribution";
 lang.expressionBuilder.stochastics.distribution.inverseGamma="Inverse gamma distribution";
 lang.expressionBuilder.stochastics.distribution.continuousBernoulli="Continuous Bernoulli distribution";
+lang.expressionBuilder.stochastics.distribution.planck="Planck distribution";
+lang.expressionBuilder.stochastics.distribution.halfCauchy="Half Cauchy distribution";
+lang.expressionBuilder.stochastics.distribution.logLaplace="Log-Laplace distribution";
+lang.expressionBuilder.stochastics.distribution.boltzmann="Boltzmann distribution";
 
 lang.expressionBuilder.logic={};
 lang.expressionBuilder.logic.name="Logic functions";

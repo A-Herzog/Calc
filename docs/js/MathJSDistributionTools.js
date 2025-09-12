@@ -527,6 +527,24 @@ class LogarithmicDistribution extends DiscreteProbabilityDistribution {
 }
 
 
+/**
+ * Planck distribution
+ */
+class PlanckDistribution extends DiscreteProbabilityDistribution {
+
+  constructor() {
+    super("planck",language.expressionBuilder.stochastics.distribution.planck);
+
+    this._addContinuousParameter("lambda",0,false,null,false);
+  }
+
+  _getPDF(values, k) {
+    if (k<0) return 0;
+    return (1-Math.exp(-values.lambda))*Math.exp(-values.lambda*k);
+  }
+}
+
+
 /* ============================================================================
  * Definition of the continuous probability distributions
  * ============================================================================ */
@@ -2060,9 +2078,9 @@ class InverseGammaDistribution extends ContinuousProbabilityDistribution {
 class ContinuousBernoulliDistribution extends ContinuousProbabilityDistribution {
   constructor() {
     super("continuousbernoulli",language.expressionBuilder.stochastics.distribution.continuousBernoulli);
-    this._addContinuousParameter("a",null,false,null,false,5);
-    this._addContinuousParameter("b",null,false,null,false,10);
-    this._addContinuousParameter("lambda",0,false,1,false,0.3);
+    this._addContinuousParameter("a",null,false,null,false);
+    this._addContinuousParameter("b",null,false,null,false);
+    this._addContinuousParameter("lambda",0,false,1,false);
   }
 
   _getPDF(values, x) {
@@ -2084,6 +2102,76 @@ class ContinuousBernoulliDistribution extends ContinuousProbabilityDistribution 
 
     const cdfFactor=(values.lambda==0.5)?1:(1/(2*values.lambda-1));
 		return cdfFactor*(Math.pow(values.lambda,x)*Math.pow(1-values.lambda,1-x)+values.lambda-1);
+  }
+}
+
+
+/**
+ * Half Cauchy distribution
+ */
+class HalfCauchyDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("halfcauchy",language.expressionBuilder.stochastics.distribution.halfCauchy);
+    this._addContinuousParameter("mu",null,false,null,false);
+    this._addContinuousParameter("sigma",0,false,null,false);
+  }
+
+  _getPDF(values, x) {
+    if (x<values.mu) return 0;
+    const densityFactor=2/Math.PI/values.sigma;
+    const inverseSigmaSqr=1/(values.sigma**2);
+	  return densityFactor/(1+(x-values.mu)**2*inverseSigmaSqr);
+  }
+
+  _getCDF(values, x) {
+    if (x<values.mu) return 0;
+    const cumulativeFactor=2/Math.PI;
+	  return cumulativeFactor*Math.atan((x-values.mu)/values.sigma);
+  }
+}
+
+
+/**
+ * Log-Laplace distribution
+ */
+class LogLaplaceDistribution extends ContinuousProbabilityDistribution {
+  constructor() {
+    super("loglaplace",language.expressionBuilder.stochastics.distribution.logLaplace);
+    this._addContinuousParameter("c",0,false,null,false);
+    this._addContinuousParameter("s",null,false,null,false);
+  }
+
+  _getPDF(values, x) {
+		x=x-values.s;
+		if (x<=0) return 0;
+		if (x<1) return values.c/2*Math.pow(x,values.c-1);
+		return values.c/2*Math.pow(x,-values.c-1);
+  }
+
+  _getCDF(values, x) {
+		x=x-values.s;
+		if (x<=0) return 0;
+		if (x<1) return 0.5*Math.pow(x,values.c);
+		return 1-0.5*Math.pow(x,-values.c);
+  }
+}
+
+
+/**
+ * Boltzmann distribution
+ */
+class BoltzmannDistribution extends DiscreteProbabilityDistribution {
+  constructor() {
+    super("boltzmann",language.expressionBuilder.stochastics.distribution.boltzmann);
+
+    this._addContinuousParameter("lambda",0,false,null,false);
+    this._addDiscreteParameter("N",1);
+  }
+
+  _getPDF(values, k) {
+    if (k<0 || k>=values.N) return 0;
+    const densityFactor=(1-Math.exp(-values.lambda))/(1-Math.exp(-values.lambda*values.N));
+		return densityFactor*Math.exp(-values.lambda*k);
   }
 }
 
@@ -2113,6 +2201,7 @@ function getDistributions() {
     new BorelDistribution(),
     new GaussKuzminDistribution(),
     new LogarithmicDistribution(),
+    new PlanckDistribution(),
 
     /* Continuous distributions */
     new UniformDistribution(),
@@ -2159,7 +2248,10 @@ function getDistributions() {
     new CosineDistribution(),
     new LogGammaDistribution(),
     new InverseGammaDistribution(),
-    new ContinuousBernoulliDistribution()
+    new ContinuousBernoulliDistribution(),
+    new HalfCauchyDistribution(),
+    new LogLaplaceDistribution(),
+    new BoltzmannDistribution(),
   ];
 
   return distributions;
