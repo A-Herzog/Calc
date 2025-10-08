@@ -45,6 +45,10 @@ class PlotPanel extends Panel {
   #inputTMax;
   #rangeTLabel;
   #rangeT;
+  #inputUMin;
+  #inputUMax;
+  #rangeULabel;
+  #rangeU;
   #inputGraph=[];
   #tableData="";
   #axisCenter=false;
@@ -219,7 +223,7 @@ class PlotPanel extends Panel {
 
     window.addEventListener("message",event=>this.#insertSymbol(event.data));
 
-    /* Additional parameter */
+    /* Additional parameter T */
     this._panel.appendChild(line=document.createElement("div"));
     line.className="mt-3";
     this.#inputTMin=this.#generateInput(line,"t<sub>min</sub>:=&nbsp;",null,100,"-10");
@@ -241,6 +245,29 @@ class PlotPanel extends Panel {
     line.appendChild(this.#rangeTLabel=document.createElement("label"));
     this.#rangeTLabel.htmlFor=this.#rangeT;
     this.#rangeTLabel.style.marginLeft="15px";
+
+    /* Additional parameter U */
+    this._panel.appendChild(line=document.createElement("div"));
+    line.className="mt-3";
+    this.#inputUMin=this.#generateInput(line,"u<sub>min</sub>:=&nbsp;",null,100,"-10");
+    this.#inputUMin.classList.add("me-3");
+    this.#inputUMin.oninput=()=>this.#updateChart();
+    this.#inputUMax=this.#generateInput(line,"u<sub>max</sub>:=&nbsp;",null,100,"10");
+    this.#inputUMax.classList.add("me-3");
+    this.#inputUMax.oninput=()=>this.#updateChart();
+    this.#rangeU=document.createElement("input");
+    line.appendChild(this.#rangeU);
+    this.#rangeU.className="form-range";
+    this.#rangeU.type="range";
+    this.#rangeU.min="0";
+    this.#rangeU.max="1000";
+    this.#rangeU.value=550;
+    this.#rangeU.style.width="300px";
+    this.#rangeU.style.paddingTop="12px";
+    this.#rangeU.oninput=()=>this.#updateChart();
+    line.appendChild(this.#rangeULabel=document.createElement("label"));
+    this.#rangeULabel.htmlFor=this.#rangeU;
+    this.#rangeULabel.style.marginLeft="15px";
 
     /* Start */
     this.#updateChart();
@@ -406,11 +433,17 @@ class PlotPanel extends Panel {
       }
     }
 
-    /* Get additional parameter */
+    /* Get additional parameter T */
     const minT=getFloat(this.#inputTMin);
     const maxT=getFloat(this.#inputTMax);
     this.#inputTMin.classList.toggle("is-invalid",minT==null); if (minT==null) ok=false;
     this.#inputTMax.classList.toggle("is-invalid",maxT==null || (minT!=null && minT>=maxT)); if (maxT==null || (minT!=null && minT>=maxT)) ok=false;
+
+    /* Get additional parameter U */
+    const minU=getFloat(this.#inputUMin);
+    const maxU=getFloat(this.#inputUMax);
+    this.#inputUMin.classList.toggle("is-invalid",minU==null); if (minU==null) ok=false;
+    this.#inputUMax.classList.toggle("is-invalid",maxU==null || (minU!=null && minU>=maxU)); if (maxU==null || (minU!=null && minU>=maxU)) ok=false;
 
     if (!ok) return;
 
@@ -421,10 +454,15 @@ class PlotPanel extends Panel {
     /* Setup x axis */
     this.#xValues=Array.from({length: this.#xSteps+1},(_,i)=>minX+i/this.#xSteps*(maxX-minX));
 
-    /* Additional parameter */
+    /* Additional parameter T */
     const tIndex=this.#rangeT.value;
     const t=minT+(maxT-minT)*tIndex/1000;
     this.#rangeTLabel.innerHTML="t:="+formatNumber(t);
+
+    /* Additional parameter U */
+    const uIndex=this.#rangeU.value;
+    const u=minU+(maxU-minU)*uIndex/1000;
+    this.#rangeULabel.innerHTML="u:="+formatNumber(u);
 
     /* Draw graphs */
     const yValuesAll=[];
@@ -435,7 +473,7 @@ class PlotPanel extends Panel {
     for (let i=0;i<graphObjects.length;i++) {
       const yValues=this.#xValues.map(x=>{
         try {
-          const res=graphObjects[i].evaluate({x: x, t: t});
+          const res=graphObjects[i].evaluate({x: x, t: t, u: u});
           if (typeof(res)=='number') return res; return NaN; /* complex numbers */
         } catch (e) {
           return NaN;
