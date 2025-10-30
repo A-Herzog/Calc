@@ -59,6 +59,8 @@ class CalcPanelSubKeys extends CalcPanelSub {
     this.#addCalcButton(tr,"ld",language.calc.panelKeysLd);
     this.#addCalcButton(tr,"log",language.calc.panelKeysLog);
     this.#addCalcButton(tr,"zeros",language.calc.panelKeysZeros);
+    this.#addSeparator(tr);
+    this.#addCalcIcon(tr,"balloon-heart",language.expressionBuilder.symbolic.simplify.name+" simplify('Term')","simplify('Term')");
 
     table.appendChild(tr=document.createElement("tr"));
     this.#addCalcButtonB(tr,"7");
@@ -77,6 +79,8 @@ class CalcPanelSubKeys extends CalcPanelSub {
     this.#addCalcButton(tr,"tan",language.calc.panelKeysTan);
     this.#addCalcButton(tr,"cot",language.calc.panelKeysCot);
     this.#addCalcButton(tr,"ones",language.calc.panelKeysOnes);
+    this.#addSeparator(tr);
+    this.#addCalcIcon(tr,"bezier",language.expressionBuilder.symbolic.derivative.name+" derivative('Term';'variable')","derivative('Term';'variable')");
 
     table.appendChild(tr=document.createElement("tr"));
     this.#addCalcButtonB(tr,"4");
@@ -144,6 +148,23 @@ class CalcPanelSubKeys extends CalcPanelSub {
 
     button.className="btn btn-sm border "+(((document.documentElement.dataset.bsTheme=='light'))?"btn-light":"btn-dark");
     button.innerHTML=text;
+    if (tooltip!='') button.title=tooltip;
+    if (typeof(onclick)=='string') {
+      button.onclick=()=>this.#insertCmd(onclick);
+    } else {
+      button.onclick=onclick;
+    }
+    button.style.width="100%";
+  }
+
+  #addCalcIcon(tr, icon, tooltip, onclick) {
+    const td=document.createElement("td");
+    tr.appendChild(td);
+
+    const button=document.createElement("button");
+    td.appendChild(button);
+
+    button.className="btn btn-sm border bi bi-"+icon+" "+(((document.documentElement.dataset.bsTheme=='light'))?"btn-light":"btn-dark");
     if (tooltip!='') button.title=tooltip;
     if (typeof(onclick)=='string') {
       button.onclick=()=>this.#insertCmd(onclick);
