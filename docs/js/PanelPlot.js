@@ -181,7 +181,7 @@ class PlotPanel extends Panel {
       nodes.input.oninput=()=>this.#updateChart();
       this.#inputGraph.push(nodes.input);
       const tdRight=document.createElement("td");
-      tdRight.style.width="100px";
+      tdRight.style.width="150px";
 
       tr.appendChild(tdRight);
       const input=nodes.input;
@@ -194,13 +194,14 @@ class PlotPanel extends Panel {
       button.style.marginLeft="5px";
       button.onclick=()=>{input.value=""; this.#updateChart();};
 
+      const currentIndex=index;
+
       /* Expression build button */
       tdRight.appendChild(button=document.createElement("button"));
       button.type="button";
       button.className="btn btn-primary btn-sm bi bi-code";
       button.title=language.calc.ExpressionBuilder;
       button.style.marginLeft="5px";
-      const currentIndex=index;
       button.onclick=()=>{
         if (isDesktopApp) {
           Neutralino.storage.setData('selectSymbol',null).then(()=>{
@@ -211,6 +212,30 @@ class PlotPanel extends Panel {
           setTimeout(()=>popup.postMessage(currentIndex+1),1500);
         }
       };
+
+      /* Derivate button */
+      tdRight.appendChild(button=document.createElement("button"));
+      button.type="button";
+      button.className="btn btn-primary btn-sm bi bi-bezier";
+      button.title=language.expressionBuilder.symbolic.derivative.name;
+      button.style.marginLeft="5px";
+      button.onclick=()=>{
+        try {
+          const diff=math.derivative(input.value,'x');
+          for (let i=0;i<this.#inputGraph.length;i++) {
+            if (i==currentIndex) continue;
+            if (this.#inputGraph[i].value.trim()=="") {
+              this.#inputGraph[i].value=diff.toString();
+              this.#updateChart();
+              return;
+            }
+          }
+          alert(language.plot.noEmptyFunctionForDerivate);
+        } catch (e) {
+          alert(e.message);
+        }
+      }
+
       index++;
     }
 

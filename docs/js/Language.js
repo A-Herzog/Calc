@@ -164,6 +164,7 @@ lang.plot.infoDiagramSaveValuesTextFiles="Textdateien";
 lang.plot.infoDiagramSaveValues="Diagramm speichern";
 lang.plot.infoDiagramSaveValuesGraphics="Bilddateien";
 lang.plot.copyDiagramImageError="Der Browser unterstützt das Kopieren von Grafiken nicht.";
+lang.plot.noEmptyFunctionForDerivate="Es ist keine leere Eingabezeile vorhanden, in die die Ableitung eingefügt werden könnte.";
 
 lang.table={};
 lang.table.mode="Modus";
@@ -1058,6 +1059,7 @@ lang.plot.infoDiagramSaveValuesTextFiles="Text files";
 lang.plot.infoDiagramSaveValues="Save diagram";
 lang.plot.infoDiagramSaveValuesGraphics="Image files";
 lang.plot.copyDiagramImageError="The browser does not support copying images to clipboard.";
+lang.plot.noEmptyFunctionForDerivate="There is no empty input line where the derivation could be inserted.";
 
 lang.table={};
 lang.table.mode="Mode";
