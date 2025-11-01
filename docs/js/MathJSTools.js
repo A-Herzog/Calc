@@ -367,6 +367,7 @@ function unitConvert(value, oldName, newName) {
  */
 function loadMathJSExtensions() {
   if (typeof(math)=='undefined' || !math.import) {setTimeout(loadMathJSExtensions,100); return;}
+  if (math.hasOwnProperty('sqr')) return; /* Already loaded */
   math.import({
     sqr: param=>param*param,
     ln: param=>math.log(param),

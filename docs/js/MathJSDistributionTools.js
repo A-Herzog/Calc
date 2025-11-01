@@ -2264,6 +2264,9 @@ function getDistributions() {
 function loadMathJSDistributionExtensions() {
   if (typeof(math)=='undefined' || !math.import) {setTimeout(loadMathJSDistributionExtensions,100); return;}
 
+  if (math.hasOwnProperty('distributionExtensionsLoaded')) return;
+  math.distributionExtensionsLoaded=true;
+
   const importFunctions={};
   getDistributions().forEach(distribution=>distribution.getFunctions(importFunctions));
   math.import(importFunctions);

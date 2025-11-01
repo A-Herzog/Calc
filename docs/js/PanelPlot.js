@@ -29,11 +29,17 @@ import {language} from './Language.js';
 class PlotPanel extends Panel {
   #xSteps=500;
 
-  #graphData=[
+  #graphData1=[
     {name: 'f(x)', color: '#008C4F', text: 'x^2'},
     {name: 'g(x)', color: '#8C1C00', text: 'sin(t*x)'},
     {name: 'h(x)', color: '#000000', text: 'exp(x)'}
   ];
+  #graphData2=[
+    {name: 'j(x)', color: '#DDDD00', text: ''},
+    {name: 'k(x)', color: '#FF00FF', text: ''},
+    {name: 'l(x)', color: '#00BBBB', text: ''}
+  ];
+
   #canvas;
   #chart;
   #xValues;
@@ -49,7 +55,9 @@ class PlotPanel extends Panel {
   #inputUMax;
   #rangeULabel;
   #rangeU;
+  #graphsTable;
   #inputGraph=[];
+  #inputGraphData=[];
   #tableData="";
   #axisCenter=false;
 
@@ -59,7 +67,6 @@ class PlotPanel extends Panel {
 
   _firstShow() {
     let line;
-    let button;
 
     /* Chart */
     this.#canvas=document.createElement("canvas");
@@ -147,6 +154,12 @@ class PlotPanel extends Panel {
       this.#updateChart();
     });
 
+    /* More graphs button */
+    const moreButton=this.#addButton(canvasInfo,"plus-circle","success",language.plot.more,language.plot.moreHint,()=>{
+      for (let graph of this.#graphData2) this.#addGraph(graph);
+      moreButton.style.display="none";
+    });
+
     /* Axis setup */
     this._panel.appendChild(line=document.createElement("div"));
     line.className="mt-3 mb-3";
@@ -163,81 +176,11 @@ class PlotPanel extends Panel {
     this.#inputYMax.oninput=()=>this.#updateChart();
 
     /* Functions */
-    const table=document.createElement("table");
-    table.style.width="100%";
-    this._panel.appendChild(table);
-    let index=0;
-    for (let graph of this.#graphData) {
-      const tr=document.createElement("tr");
-      table.appendChild(tr);
-      const nodes=this.#generateInputElements(graph.name+':=',graph.color,null,graph.text);
-      const tdLeft=document.createElement("td");
-      tr.appendChild(tdLeft);
-      tdLeft.style.width="60px";
-      tdLeft.appendChild(nodes.label);
-      const tdCenter=document.createElement("td");
-      tr.appendChild(tdCenter);
-      tdCenter.appendChild(nodes.input);
-      nodes.input.oninput=()=>this.#updateChart();
-      this.#inputGraph.push(nodes.input);
-      const tdRight=document.createElement("td");
-      tdRight.style.width="150px";
+    this.#graphsTable=document.createElement("table");
+    this.#graphsTable.style.width="100%";
+    this._panel.appendChild(this.#graphsTable);
 
-      tr.appendChild(tdRight);
-      const input=nodes.input;
-
-      /* Delete button */
-      tdRight.appendChild(button=document.createElement("button"));
-      button.type="button";
-      button.className="btn btn-danger btn-sm bi bi-trash";
-      button.title=language.plot.clearInput;
-      button.style.marginLeft="5px";
-      button.onclick=()=>{input.value=""; this.#updateChart();};
-
-      const currentIndex=index;
-
-      /* Expression build button */
-      tdRight.appendChild(button=document.createElement("button"));
-      button.type="button";
-      button.className="btn btn-primary btn-sm bi bi-code";
-      button.title=language.calc.ExpressionBuilder;
-      button.style.marginLeft="5px";
-      button.onclick=()=>{
-        if (isDesktopApp) {
-          Neutralino.storage.setData('selectSymbol',null).then(()=>{
-            Neutralino.storage.setData('returnID',''+(currentIndex+1)).then(()=>window.open("info_webapp.html"));
-          });
-        } else {
-          const popup=window.open("info.html");
-          setTimeout(()=>popup.postMessage(currentIndex+1),1500);
-        }
-      };
-
-      /* Derivate button */
-      tdRight.appendChild(button=document.createElement("button"));
-      button.type="button";
-      button.className="btn btn-primary btn-sm bi bi-bezier";
-      button.title=language.expressionBuilder.symbolic.derivative.name;
-      button.style.marginLeft="5px";
-      button.onclick=()=>{
-        try {
-          const diff=math.derivative(input.value,'x');
-          for (let i=0;i<this.#inputGraph.length;i++) {
-            if (i==currentIndex) continue;
-            if (this.#inputGraph[i].value.trim()=="") {
-              this.#inputGraph[i].value=diff.toString();
-              this.#updateChart();
-              return;
-            }
-          }
-          alert(language.plot.noEmptyFunctionForDerivate);
-        } catch (e) {
-          alert(e.message);
-        }
-      }
-
-      index++;
-    }
+    for (let graph of this.#graphData1) this.#addGraph(graph);
 
     if (isDesktopApp) setInterval(()=>{
       Neutralino.storage.getData('selectSymbol').then(data=>{
@@ -298,10 +241,82 @@ class PlotPanel extends Panel {
     this.#updateChart();
   }
 
+  #addGraph(graph) {
+    const tr=document.createElement("tr");
+    this.#graphsTable.appendChild(tr);
+    const nodes=this.#generateInputElements(graph.name+':=',graph.color,null,graph.text);
+    const tdLeft=document.createElement("td");
+    tr.appendChild(tdLeft);
+    tdLeft.style.width="60px";
+    tdLeft.appendChild(nodes.label);
+    const tdCenter=document.createElement("td");
+    tr.appendChild(tdCenter);
+    tdCenter.appendChild(nodes.input);
+    nodes.input.oninput=()=>this.#updateChart();
+    this.#inputGraph.push(nodes.input);
+    this.#inputGraphData.push(graph);
+    const tdRight=document.createElement("td");
+    tdRight.style.width="150px";
+    tr.appendChild(tdRight);
+    const input=nodes.input;
+
+    let button;
+
+    /* Delete button */
+    tdRight.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="btn btn-danger btn-sm bi bi-trash";
+    button.title=language.plot.clearInput;
+    button.style.marginLeft="5px";
+    button.onclick=()=>{input.value=""; this.#updateChart();};
+
+    const currentIndex=this.#inputGraph.length-1;
+
+    /* Expression build button */
+    tdRight.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="btn btn-primary btn-sm bi bi-code";
+    button.title=language.calc.ExpressionBuilder;
+    button.style.marginLeft="5px";
+    button.onclick=()=>{
+      if (isDesktopApp) {
+        Neutralino.storage.setData('selectSymbol',null).then(()=>{
+          Neutralino.storage.setData('returnID',''+(currentIndex+10)).then(()=>window.open("info_webapp.html"));
+        });
+      } else {
+        const popup=window.open("info.html");
+        setTimeout(()=>popup.postMessage(currentIndex+10),1500);
+      }
+    };
+
+    /* Derivate button */
+    tdRight.appendChild(button=document.createElement("button"));
+    button.type="button";
+    button.className="btn btn-primary btn-sm bi bi-bezier";
+    button.title=language.expressionBuilder.symbolic.derivative.name;
+    button.style.marginLeft="5px";
+    button.onclick=()=>{
+      try {
+        const diff=math.derivative(input.value,'x');
+        for (let i=0;i<this.#inputGraph.length;i++) {
+          if (i==currentIndex) continue;
+          if (this.#inputGraph[i].value.trim()=="") {
+            this.#inputGraph[i].value=diff.toString();
+            this.#updateChart();
+            return;
+          }
+        }
+        alert(language.plot.noEmptyFunctionForDerivate);
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+  }
+
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID<1 || json.ID>this.#inputGraph.length) return;
-    const input=this.#inputGraph[json.ID-1];
+    if (json.ID<10 || json.ID>10+this.#inputGraph.length-1) return;
+    const input=this.#inputGraph[json.ID-10];
     const str=input.value;
     const caret=input.selectionStart;
     input.value=str.substring(0,caret)+json.symbol+str.substring(caret);
@@ -345,6 +360,7 @@ class PlotPanel extends Panel {
     button.innerHTML=" "+text;
     button.title=hint;
     button.onclick=action;
+    return button;
   }
 
   #addMenuButton(parent, icon, color, text, subText, subAction) {
@@ -504,7 +520,7 @@ class PlotPanel extends Panel {
           return NaN;
         }
       });
-      data.datasets.push({type: 'line', pointRadius: 0, label: this.#graphData[i].name+':='+this.#inputGraph[i].value, data: yValues, borderColor: this.#graphData[i].color, pointHitRadius: 30});
+      data.datasets.push({type: 'line', pointRadius: 0, label: this.#inputGraphData[i].name+':='+this.#inputGraph[i].value, data: yValues, borderColor: this.#inputGraphData[i].color, pointHitRadius: 30});
       yValuesAll.push(yValues);
     }
 
@@ -514,7 +530,7 @@ class PlotPanel extends Panel {
 
     /* Build table data (for export) */
     const firstRow=["x"];
-    this.#graphData.forEach(graph=>firstRow.push(graph.name));
+    this.#inputGraphData.forEach(graph=>firstRow.push(graph.name));
     const table=[firstRow.join("\t")];
     for (let i=0;i<this.#xValues.length;i++) {
       const row=[formatNumber(this.#xValues[i],8)];

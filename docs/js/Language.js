@@ -142,11 +142,15 @@ lang.calc.panelInfoText=`
 <li>"integrate('x^2';'x';0;10)" berechnet numerisch den Wert des Integrals über dem angegebenen Bereich.</li>
 </ul>
 `;
+lang.calc.more="Weiteres Eingabefeld";
+lang.calc.moreHint="Fügt eine weitere Rechner-Seite hinzu.";
 
 lang.plot={};
 lang.plot.clearInput="Eingabe löschen";
 lang.plot.clearInputAll="Alle löschen";
 lang.plot.clearInputAllHint="Löscht alle dargestellten Funktionen.";
+lang.plot.more="Mehr Graphen";
+lang.plot.moreHint="Weitere Eingabefelder hinzufügen.";
 lang.plot.resetZoom="Standardzoom";
 lang.plot.resetZoomHint="Setzt den dargestellten Bereich wieder auf die Standardwerte zurück."
 lang.plot.zoomInfo="Mit gedrückter <span class='border rounded-1 ps-1 pe-1'><tt>Strg</tt></span>-Taste kann per Mausrad gezoomt werden und es können Zoom-Rahmen aufgezogen werden.";
@@ -1037,11 +1041,15 @@ lang.calc.panelInfoText=`
 <li>"integrate('x^2';'x';0;10)" numerically calculates the value of the integral over the specified range.</li>
 </ul>
 `;
+lang.calc.more="Add input line";
+lang.calc.moreHint="Adds another input line for calculations.";
 
 lang.plot={};
 lang.plot.clearInput="Clear input";
 lang.plot.clearInputAll="Clear all";
 lang.plot.clearInputAllHint="Deletes all displayed functions.";
+lang.plot.more="More graphs";
+lang.plot.moreHint="Add more input lines.";
 lang.plot.resetZoom="Reset zoom";
 lang.plot.resetZoomHint="Resets the displayed area to the default values."
 lang.plot.zoomInfo="By holding down the <span class='border rounded-1 ps-1 pe-1 bg-light'><tt>Ctrl</tt></span> key, the mouse wheel can be used to zoom in and out, and zoom frames can be drawn.";

@@ -42,7 +42,7 @@ document.documentElement.dataset.bsTheme=selectedColorMode;
 
 /* Init tabs */
 const tabs=new Tabs();
-tabs.add(language.GUI.tabCalculator,"calculator",new CalcPanel());
+tabs.add(language.GUI.tabCalculator,"calculator",new CalcPanel(0,()=>addCalculatorTab(1)));
 tabs.add(language.GUI.tabPlotter,"graph-up",new PlotPanel());
 tabs.add(language.GUI.tabTable,"table",new TablePanel());
 tabs.add(language.GUI.tabNumberSystems,"123",new NumberSystemsPanel());
@@ -69,3 +69,10 @@ setTimeout(()=>{
   initSizeCalculation();
   setMinWidth(1000);
 },0);
+
+/* Function to add additional calculator tabs */
+function addCalculatorTab(nr) {
+  let callback=null;
+  if (nr<2) callback=()=>addCalculatorTab(nr+1);
+  tabs.addAndUpdate(language.GUI.tabCalculator+" "+(nr+1),"calculator",new CalcPanel(nr,callback),nr);
+}

@@ -33,6 +33,7 @@ import {language} from './Language.js';
  * @see Panel
  */
 class CalcPanel extends Panel {
+  #returnID;
   #editInput;
   #errorInfo;
   #editOutput;
@@ -44,8 +45,15 @@ class CalcPanel extends Panel {
   #panelConsts;
   #panelFunctions;
 
-  constructor() {
+  /**
+   * Constructor
+   * @param {Number} returnID Unique Id for calling the expression builder.
+   * @param {Function} addAdditionalTabCallback Callback to add additional tabs (optional, defaults to null for "no new tabs").
+   */
+  constructor(returnID, addAdditionalTabCallback=null) {
     super();
+
+    this.#returnID=returnID;
 
     loadMathJSExtensions();
     loadMathJSDistributionExtensions();
@@ -64,11 +72,11 @@ class CalcPanel extends Panel {
     button=this.#createButton(td,"",language.calc.ExpressionBuilder,"primary",()=>{
       if (isDesktopApp) {
         Neutralino.storage.setData('selectSymbol',null).then(()=>{
-          Neutralino.storage.setData('returnID','0').then(()=>window.open("info_webapp.html"));
+          Neutralino.storage.setData('returnID',''+this.#returnID).then(()=>window.open("info_webapp.html"));
         });
       } else {
         const popup=window.open("info.html");
-        setTimeout(()=>popup.postMessage("0"),1500);
+        setTimeout(()=>popup.postMessage(""+this.#returnID),1500);
       }
     });
     if (isDesktopApp) setInterval(()=>{
@@ -106,6 +114,14 @@ class CalcPanel extends Panel {
     /* Primary buttons line */
     for (let i=0;i<5;i++) this.#buttons.push(this.#createButton(div,"","","primary",()=>this.#showSubPanel(i)));
 
+    if (addAdditionalTabCallback!=null) {
+      const more=this.#createButton(div," "+language.calc.more,language.calc.moreHint,"success",()=>{
+        addAdditionalTabCallback();
+        more.remove();
+      });
+      more.classList.add("bi-plus-circle");
+    }
+
     /* Sub panels */
     this.#panels.push(this.#panelMemory=new CalcPanelSubMemory(this._panel,()=>this.#editOutput.value,m=>this.#insertInInput(m)));
     this.#panels.push(new CalcPanelSubKeys(this._panel,cmd=>this.#insertInInput(cmd),()=>{this.#editInput.value=''; this.#calc();}));
@@ -122,7 +138,7 @@ class CalcPanel extends Panel {
 
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID!=0) return;
+    if (json.ID!=this.#returnID) return;
     const str=this.#editInput.value;
     const caret=this.#editInput.selectionStart;
     this.#editInput.value=str.substring(0,caret)+json.symbol+str.substring(caret);

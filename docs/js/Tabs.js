@@ -25,14 +25,62 @@ import {language} from './Language.js';
 class Tabs {
   #data=[];
 
+  #navUl;
+  #mainDiv;
+
   /**
    * Adds a panel to the panels list.
    * @param {String} name Title of the panel (shown in the navigation bar)
    * @param {String} icon Bootstrap icon to be displayed next to the title (can be empty for no icon)
    * @param {Object} tab Panel object
+   * @param {Number} index Index where to insert the panel (default: at the end)
    */
-  add(name, icon, tab) {
-    this.#data.push({name: name, icon: icon, tab: tab, panel: tab.panel});
+  add(name, icon, tab, index=-1) {
+    if (index<0 || index>this.#data.length) {
+      this.#data.push({name: name, icon: icon, tab: tab, panel: tab.panel});
+    } else {
+      this.#data.splice(index,0,{name: name, icon: icon, tab: tab, panel: tab.panel});
+    }
+  }
+
+  /**
+   * Adds a panel to the panels list after GUI is already generated.
+   * @param {String} name Title of the panel (shown in the navigation bar)
+   * @param {String} icon Bootstrap icon to be displayed next to the title (can be empty for no icon)
+   * @param {Object} tab Panel object
+   * @param {Number} index Index where to insert the panel (default: at the end)
+   */
+  addAndUpdate(name, icon, tab, index=-1) {
+    this.add(name, icon, tab, index);
+    this.addNav((index<0 || index>this.#data.length)?this.#data.length-1:index);
+    this.addMain((index<0 || index>this.#data.length)?this.#data.length-1:index);
+  }
+
+  /**
+   * Adds a new entry to the navigation bar.
+   * @param {Number} index Position to insert the new navigation bar entry
+   * @param {Boolean} active Is the new entry active?
+   */
+  addNav(index, active=false) {
+    const rec=this.#data[index];
+
+    const li=document.createElement("li");
+    if (this.#navUl.children.length<=index) {
+      this.#navUl.appendChild(li);
+    } else {
+      this.#navUl.insertBefore(li,this.#navUl.children[index]);
+    }
+    li.className="nav-item";
+    const a=document.createElement("button");
+    li.appendChild(a);
+    a.className="nav-link"+(active?" active":"");
+    a.style.cursor="pointer";
+    rec.a=a;
+    a.onclick=()=>this.#showTab(a);
+    let text="";
+    if (rec.icon) text+="<span class='bi-"+rec.icon+"' title='"+rec.name+"'></span>"
+    text+="<span class='menuTabTitle'>&nbsp;"+rec.name+"</span>";
+    a.innerHTML=text;
   }
 
   /**
@@ -70,23 +118,8 @@ class Tabs {
     const ul=document.createElement("ul");
     divCollapse.appendChild(ul);
     ul.className="navbar-nav me-auto";
-    let index=0;
-    for (let rec of this.#data) {
-      const li=document.createElement("li");
-      ul.appendChild(li);
-      li.className="nav-item";
-      const a=document.createElement("button");
-      li.appendChild(a);
-      a.className="nav-link"+((index==0)?" active":"");
-      a.style.cursor="pointer";
-      rec.a=a;
-      a.onclick=()=>this.#showTab(a);
-      let text="";
-      if (rec.icon) text+="<span class='bi-"+rec.icon+"' title='"+rec.name+"'></span>"
-      text+="<span class='menuTabTitle'>&nbsp;"+rec.name+"</span>";
-      a.innerHTML=text;
-      index++;
-    }
+    this.#navUl=ul;
+    for (let i=0;i<this.#data.length;i++) this.addNav(i,i==0);
 
     /* Language switcher */
     const langButton=document.createElement("button");
@@ -160,19 +193,31 @@ class Tabs {
   }
 
   /**
+   * Adds a new panel to the main area.
+   * @param {Number} index Position to insert the new tab
+   * @param {Boolean} active Is the new tab active?
+   */
+  addMain(index, active=false) {
+    const rec=this.#data[index];
+    if (this.#mainDiv.children.length<=index) {
+      this.#mainDiv.appendChild(rec.panel);
+    } else {
+      this.#mainDiv.insertBefore(rec.panel,this.#mainDiv.children[index]);
+    }
+    rec.panel.style.display=active?"":"none";
+  }
+
+  /**
    * Returns the main area.
    */
   get main() {
     const div=document.createElement("div");
     div.className=(document.documentElement.dataset.bsTheme=='light')?"bg-light":"bg-dark";
     div.style.padding="10px";
+    this.#mainDiv=div;
 
-    let index=0;
-    for (let rec of this.#data) {
-      div.appendChild(rec.panel);
-      rec.panel.style.display=(index==0)?"":"none";
-      index++;
-    }
+    for (let i=0;i<this.#data.length;i++) this.addMain(i,i==0);
+
     return div;
   }
 
