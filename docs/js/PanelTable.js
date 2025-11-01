@@ -84,6 +84,25 @@ class TablePanel extends Panel {
     div.appendChild(this.#sequenceLine1=document.createElement("span"));
     this.#sequenceInput=this.#createInput(this.#sequenceLine1,500,"-a/2",language.table.sequencePlaceholder,"a<sub>n+1</sub>:=");
 
+    const button=this.#createButton(div,"",language.calc.ExpressionBuilder,"code",()=>{
+    if (isDesktopApp) {
+        Neutralino.storage.setData('selectSymbol',null).then(()=>{
+          Neutralino.storage.setData('returnID','200').then(()=>window.open("info_webapp.html"));
+        });
+      } else {
+        const popup=window.open("info.html");
+        setTimeout(()=>popup.postMessage("200"),1500);
+      }
+    });
+    if (isDesktopApp) setInterval(()=>{
+      Neutralino.storage.getData('selectSymbol').then(data=>{
+        Neutralino.storage.setData('selectSymbol',null);
+        this.#insertSymbol(data);
+      }).catch(()=>{});
+    },250);
+    window.addEventListener("message",event=>this.#insertSymbol(event.data));
+    button.style.marginLeft="5px";
+
     /* Line 2 */
     div=this._createDiv(this._panel);
     div.className="mt-2";
@@ -116,6 +135,20 @@ class TablePanel extends Panel {
     this.#updateTable();
   }
 
+  #insertSymbol(jsonString) {
+    const json=JSON.parse(jsonString);
+    if (json.ID!=200) return;
+    let input=null;
+    switch (parseInt(this.#mode.value)) {
+      case 0: input=this.#functionInput; break;
+      case 1: input=this.#sequenceInput; break;
+    }
+    if (input==null) return;
+    const str=input.value;
+    const caret=input.selectionStart;
+    input.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+  }
+
   #createLabel(parent, text) {
     const label=document.createElement("label");
     parent.appendChild(label);
@@ -144,10 +177,11 @@ class TablePanel extends Panel {
     const button=document.createElement("button");
     parent.appendChild(button);
     button.type="button";
-    button.className="btn btn-primary bi bi-"+icon+" me-3";
+    button.className="btn btn-sm btn-primary bi bi-"+icon+" me-3";
     button.innerHTML=" "+text;
     button.title=tooltip;
     button.onclick=action;
+    return button;
   }
 
   #updateTable() {
