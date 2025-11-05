@@ -33,6 +33,7 @@ class StatisticsPanel extends Panel {
   #inputCard;
   #input;
   #output;
+  #outputLower;
   #canvas;
   #chart;
   #xValues=[];
@@ -151,6 +152,8 @@ class StatisticsPanel extends Panel {
     cardBody=this.#createCard(inner,language.statistics.Characteristics);
     this.#output=this._createDiv(cardBody);
     this.#createCanvas(cardBody);
+    this.#outputLower=this._createDiv(cardBody);
+    this.#outputLower.className="mt-3 small";
 
     /* Start */
     this.#update();
@@ -395,8 +398,12 @@ class StatisticsPanel extends Panel {
       if (mean!=0) output.push(language.statistics.cv+": <b>"+mathCV+"="+formatNumber(sd/Math.abs(mean),8)+"</b>");
       for (let level of [0.9, 0.95, 0.99]) output.push(language.statistics.confidenceInterval+" "+(level*100).toLocaleString()+"%: "+this.#getConfidenceInterval(numberCount,mean,sd,level));
     }
+
     this.#output.innerHTML=output.join("<br>");
 
+    this.#outputLower.innerHTML=language.statistics.distributionFitterInfo;
+
+    /* Update histogram */
     this.#updateHistogram(arr);
   }
 
