@@ -205,9 +205,27 @@ class TablePanel extends Panel {
 
   #updateFunction() {
     /* Interpret input */
-    const minX=getFloat(this.#functionMin);
-    const maxX=getFloat(this.#functionMax);
-    const stepWide=getPositiveFloat(this.#functionWide);
+    let minX=null;
+    try {
+      minX=math.evaluate(preprocessInput(this.#functionMin.value));
+    } catch (e) {
+      minX=null;
+    }
+
+    let maxX=null;
+    try {
+      maxX=math.evaluate(preprocessInput(this.#functionMax.value));
+    } catch (e) {
+      maxX=null;
+    }
+
+    let stepWide=null;
+    try {
+      stepWide=math.evaluate(preprocessInput(this.#functionWide.value));
+      if (stepWide<=0) stepWide=null;
+    } catch (e) {
+      stepWide=null;
+    }
 
     let ok=true;
 
@@ -229,7 +247,8 @@ class TablePanel extends Panel {
     /* Build output */
     this.#outputLine(this.#tableHead,"th","x","f(x)");
     let count=0;
-    for (let x=minX;x<=maxX;x+=stepWide) {
+    let x=minX;
+    while (x<=maxX) {
       if (count>this.MAX_LINES) {
         this.#outputLine(this.#tableBody,"td","...","...");
         break;
@@ -241,6 +260,7 @@ class TablePanel extends Panel {
         this.#outputLine(this.#tableBody,"td",formatNumber(x),"???");
       }
       count++;
+      x=minX+count*stepWide;
     }
   }
 
