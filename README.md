@@ -2,6 +2,20 @@
 
 Calculator is a web service for different calculation tasks.
 
+### Screenshots
+
+Calculator page:
+
+![Calculator page](ScreenshotCalculator.png)
+
+Function plotter page:
+
+![Function plotter page](ScreenshotFunctionPlotter.png)
+
+Statistics page:
+
+![Statistics page](ScreenshotStatistics.png)
+
 ## Usage
 
 To use the calculator just go to
