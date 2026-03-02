@@ -211,7 +211,7 @@ class Tabs {
    * Returns the main area.
    */
   get main() {
-    const div=document.createElement("div");
+    const div=document.createElement("main");
     div.className=(document.documentElement.dataset.bsTheme=='light')?"bg-light":"bg-dark";
     div.style.padding="10px";
     this.#mainDiv=div;

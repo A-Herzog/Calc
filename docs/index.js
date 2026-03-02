@@ -74,5 +74,6 @@ setTimeout(()=>{
 function addCalculatorTab(nr) {
   let callback=null;
   if (nr<2) callback=()=>addCalculatorTab(nr+1);
-  tabs.addAndUpdate(language.GUI.tabCalculator+" "+(nr+1),"calculator",new CalcPanel(nr,callback),nr);
+  tabs.addAndUpdate(""+(nr+1),"calculator",new CalcPanel(nr,callback),nr);
+  document.getElementsByClassName("menuTabTitle")[0].innerHTML="&nbsp;1";
 }

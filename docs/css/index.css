@@ -40,13 +40,13 @@ footer a {
   display: none;
 }
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1075px) {
   .menuButtonTitle {
     display: none;
   }
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1025px) {
   .menuTabTitle {
     display: none;
   }
