@@ -184,8 +184,9 @@ class PlotPanel extends Panel {
 
     if (isDesktopApp) setInterval(()=>{
       Neutralino.storage.getData('selectSymbol').then(data=>{
-        Neutralino.storage.setData('selectSymbol',null);
-        this.#insertSymbol(data);
+        if (this.#insertSymbol(data)) {
+          Neutralino.storage.setData('selectSymbol',null).catch(()=>{});
+        }
       }).catch(()=>{});
     },250);
 
@@ -282,6 +283,8 @@ class PlotPanel extends Panel {
       if (isDesktopApp) {
         Neutralino.storage.setData('selectSymbol',null).then(()=>{
           Neutralino.storage.setData('returnID',''+(currentIndex+10)).then(()=>window.open("info_webapp.html"));
+        }).catch(()=>{
+          Neutralino.storage.setData('returnID',''+(currentIndex+10)).then(()=>window.open("info_webapp.html"));
         });
       } else {
         const popup=window.open("info.html");
@@ -315,12 +318,13 @@ class PlotPanel extends Panel {
 
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID<10 || json.ID>10+this.#inputGraph.length-1) return;
+    if (json.ID<10 || json.ID>10+this.#inputGraph.length-1) return false;
     const input=this.#inputGraph[json.ID-10];
     const str=input.value;
     const caret=input.selectionStart;
     input.value=str.substring(0,caret)+json.symbol+str.substring(caret);
     this.#updateChart();
+    return true;
   }
 
   #generateInputElements(labelText, labelColor, width, value) {

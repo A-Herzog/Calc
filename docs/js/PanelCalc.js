@@ -73,6 +73,8 @@ class CalcPanel extends Panel {
       if (isDesktopApp) {
         Neutralino.storage.setData('selectSymbol',null).then(()=>{
           Neutralino.storage.setData('returnID',''+this.#returnID).then(()=>window.open("info_webapp.html"));
+        }).catch(()=>{
+          Neutralino.storage.setData('returnID',''+this.#returnID).then(()=>window.open("info_webapp.html"));
         });
       } else {
         const popup=window.open("info.html");
@@ -81,8 +83,9 @@ class CalcPanel extends Panel {
     });
     if (isDesktopApp) setInterval(()=>{
       Neutralino.storage.getData('selectSymbol').then(data=>{
-        Neutralino.storage.setData('selectSymbol',null);
-        this.#insertSymbol(data);
+        if (this.#insertSymbol(data)) {
+          Neutralino.storage.setData('selectSymbol',null).catch(()=>{});
+        }
       }).catch(()=>{});
     },250);
 
@@ -138,11 +141,12 @@ class CalcPanel extends Panel {
 
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID!=this.#returnID) return;
+    if (json.ID!=this.#returnID) return false;
     const str=this.#editInput.value;
     const caret=this.#editInput.selectionStart;
     this.#editInput.value=str.substring(0,caret)+json.symbol+str.substring(caret);
     this.#calc();
+    return true;
   }
 
   #insertInInput(text) {

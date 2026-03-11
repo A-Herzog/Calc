@@ -88,6 +88,8 @@ class TablePanel extends Panel {
     if (isDesktopApp) {
         Neutralino.storage.setData('selectSymbol',null).then(()=>{
           Neutralino.storage.setData('returnID','200').then(()=>window.open("info_webapp.html"));
+        }).catch(()=>{
+          Neutralino.storage.setData('returnID','200').then(()=>window.open("info_webapp.html"));
         });
       } else {
         const popup=window.open("info.html");
@@ -96,8 +98,9 @@ class TablePanel extends Panel {
     });
     if (isDesktopApp) setInterval(()=>{
       Neutralino.storage.getData('selectSymbol').then(data=>{
-        Neutralino.storage.setData('selectSymbol',null);
-        this.#insertSymbol(data);
+        if (this.#insertSymbol(data)) {
+          Neutralino.storage.setData('selectSymbol',null).catch(()=>{});
+        }
       }).catch(()=>{});
     },250);
     window.addEventListener("message",event=>this.#insertSymbol(event.data));
@@ -137,16 +140,18 @@ class TablePanel extends Panel {
 
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID!=200) return;
+    if (json.ID!=200) return false;
     let input=null;
     switch (parseInt(this.#mode.value)) {
       case 0: input=this.#functionInput; break;
       case 1: input=this.#sequenceInput; break;
     }
-    if (input==null) return;
+    if (input==null) return false;
     const str=input.value;
     const caret=input.selectionStart;
     input.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+    this.#updateTable();
+    return true;
   }
 
   #createLabel(parent, text) {

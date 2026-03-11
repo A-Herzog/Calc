@@ -71,6 +71,8 @@ class StatisticsPanel extends Panel {
       if (isDesktopApp) {
         Neutralino.storage.setData('selectSymbol',null).then(()=>{
           Neutralino.storage.setData('returnID','100').then(()=>window.open("info_webapp.html"));
+        }).catch(()=>{
+          Neutralino.storage.setData('returnID','100').then(()=>window.open("info_webapp.html"));
         });
       } else {
         const popup=window.open("info.html");
@@ -79,8 +81,9 @@ class StatisticsPanel extends Panel {
     });
     if (isDesktopApp) setInterval(()=>{
       Neutralino.storage.getData('selectSymbol').then(data=>{
-        Neutralino.storage.setData('selectSymbol',null);
-        this.#insertSymbol(data);
+        if (this.#insertSymbol(data)) {
+          Neutralino.storage.setData('selectSymbol',null).catch(()=>{});
+        }
       }).catch(()=>{});
     },250);
     window.addEventListener("message",event=>this.#insertSymbol(event.data));
@@ -200,10 +203,11 @@ class StatisticsPanel extends Panel {
 
   #insertSymbol(jsonString) {
     const json=JSON.parse(jsonString);
-    if (json.ID!=100) return;
+    if (json.ID!=100) return false;
     const str=this.#calc.value;
     const caret=this.#calc.selectionStart;
     this.#calc.value=str.substring(0,caret)+json.symbol+str.substring(caret);
+    return true;
   }
 
   #createCol(parent) {

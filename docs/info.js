@@ -196,10 +196,10 @@ updateSize();
 let sourceWindow=null;
 let sourceID=null;
 if (isDesktopApp) {
-  Neutralino.storage.setData('selectSymbol',null);
+  Neutralino.storage.setData('selectSymbol',null).catch(()=>{});
   Neutralino.storage.getData("returnID").then(data=>{
     sourceID=parseInt(data);
-    Neutralino.storage.setData("returnID",null);
+    Neutralino.storage.setData("returnID",null).catch(()=>{});
   });
 } else {
   window.addEventListener("message",event=>{
