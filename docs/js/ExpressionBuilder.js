@@ -221,6 +221,7 @@ function buildExpressions() {
     {symbol: "atan", full: "atan(x)", data: "atan"},
     {symbol: "acot", full: "acot(x)", data: "acot"},
     {symbol: "sinh", full: "sinh(x)", data: "sinh"},
+    {symbol: "csch", full: "csch(x)", data: "csch"},
     {symbol: "cosh", full: "cosh(x)", data: "cosh"},
     {symbol: "sech", full: "sech(x)", data: "sech"},
     {symbol: "tanh", full: "tanh(x)", data: "tanh"},
