@@ -25,8 +25,14 @@ class Panel {
    */
   _panel;
 
+  /**
+   * Is this a small screen smartphone in portrait mode?
+   */
+  _isSmartphone;
+
   constructor() {
     this._panel=document.createElement("div");
+    this._isSmartphone=(screen.width<550);
   }
 
   /**

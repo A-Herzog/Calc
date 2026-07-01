@@ -51,6 +51,8 @@ class NumberSystemsPanel extends Panel {
     this.#calc(this.#bases[2].edit);
   }
 
+  #inputIDCounter=0;
+
   #generateLine(parent, setup) {
     const tr=document.createElement("tr");
     parent.appendChild(tr);
@@ -79,7 +81,8 @@ class NumberSystemsPanel extends Panel {
     edit.style.display="inline-block";
     edit.style.width="200px";
     edit.oninput=()=>this.#calc(edit);
-    label.htmlFor=edit;
+    label.htmlFor=edit.id="number-systems-"+this.#inputIDCounter;
+    this.#inputIDCounter++;
 
     /* ASCII mode? */
     if (setup.base=='char') {
@@ -105,7 +108,7 @@ class NumberSystemsPanel extends Panel {
       this.#freeBase.style.display="inline-block";
       this.#freeBase.style.width="100px";
       this.#freeBase.oninput=()=>this.#calc(this.#freeBase);
-      label2.htmlFor=this.#freeBase;
+      label2.htmlFor=this.#freeBase.id="number-systems-free-base-select";
     }
   }
 

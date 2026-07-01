@@ -78,6 +78,8 @@ class PlotPanel extends Panel {
       data: {labels: [],  datasets: [{type: 'line', label: '', data: [0]}]}, /* Dummy data on init needed; otherwise later updates will fail */
       options: this.#getChartOptions()
     });
+    if (this._isSmartphone) this.#chart.options.maintainAspectRatio=false;
+    this.#setSize(1);
 
     /* Zoom info line */
     const canvasInfo=document.createElement("div");
@@ -204,6 +206,7 @@ class PlotPanel extends Panel {
     this.#rangeT=document.createElement("input");
     line.appendChild(this.#rangeT);
     this.#rangeT.className="form-range";
+    this.#rangeT.id="plot-range-t";
     this.#rangeT.type="range";
     this.#rangeT.min="0";
     this.#rangeT.max="1000";
@@ -212,7 +215,7 @@ class PlotPanel extends Panel {
     this.#rangeT.style.paddingTop="12px";
     this.#rangeT.oninput=()=>this.#updateChart();
     line.appendChild(this.#rangeTLabel=document.createElement("label"));
-    this.#rangeTLabel.htmlFor=this.#rangeT;
+    this.#rangeTLabel.htmlFor="plot-range-t";
     this.#rangeTLabel.style.marginLeft="15px";
 
     /* Additional parameter U */
@@ -227,6 +230,7 @@ class PlotPanel extends Panel {
     this.#rangeU=document.createElement("input");
     line.appendChild(this.#rangeU);
     this.#rangeU.className="form-range";
+    this.#rangeU.id="plot-range-u";
     this.#rangeU.type="range";
     this.#rangeU.min="0";
     this.#rangeU.max="1000";
@@ -235,7 +239,7 @@ class PlotPanel extends Panel {
     this.#rangeU.style.paddingTop="12px";
     this.#rangeU.oninput=()=>this.#updateChart();
     line.appendChild(this.#rangeULabel=document.createElement("label"));
-    this.#rangeULabel.htmlFor=this.#rangeU;
+    this.#rangeULabel.htmlFor="plot-range-u";
     this.#rangeULabel.style.marginLeft="15px";
 
     /* Start */
@@ -327,9 +331,11 @@ class PlotPanel extends Panel {
     return true;
   }
 
+  #inputIDCounter=0;
+
   #generateInputElements(labelText, labelColor, width, value) {
     const label=document.createElement("label");
-        label.className="form-label";
+    label.className="form-label";
     label.innerHTML=labelText;
     if (labelColor) label.style.color=labelColor;
 
@@ -343,7 +349,8 @@ class PlotPanel extends Panel {
     }
     input.value=value;
 
-    label.htmlFor=input;
+    label.htmlFor=input.id="plot-input-"+this.#inputIDCounter;
+    this.#inputIDCounter++;
 
     return {label: label, input: input};
   }
@@ -571,16 +578,35 @@ class PlotPanel extends Panel {
   #setSize(mode) {
     switch (mode) {
       case 0: /* Maximum size */
-        this.#canvas.style.maxHeight="";
+        if (this._isSmartphone) {
+          this.#canvas.style.maxHeight="800px";
+        } else {
+          this.#canvas.style.maxHeight="";
+        }
         break;
       case 1: /* Minimum size */
-        this.#canvas.style.maxHeight="568px";
+        if (this._isSmartphone) {
+          this.#canvas.style.maxHeight="284px";
+          this.#canvas.style.maxHeight="284px";
+        } else {
+          this.#canvas.style.maxHeight="568px";
+        }
         break;
       case 2: /* Medium size */
-        this.#canvas.style.maxHeight="800px";
+        if (this._isSmartphone) {
+          this.#canvas.style.maxHeight="400px";
+          this.#canvas.style.maxHeight="400px";
+        } else {
+          this.#canvas.style.maxHeight="800px";
+        }
         break;
       case 3: /* Large size */
-        this.#canvas.style.maxHeight="1024px";
+        if (this._isSmartphone) {
+          this.#canvas.style.maxHeight="512px";
+          this.#canvas.style.maxHeight="512px";
+        } else {
+          this.#canvas.style.maxHeight="1024px";
+        }
         break;
     }
     this.#canvas.style.width="";

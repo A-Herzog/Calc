@@ -265,6 +265,11 @@ class StatisticsPanel extends Panel {
   #runCalc(repeatCount) {
     try {
       const text=preprocessInput(this.#calc.value);
+      if (text.trim()=='') {
+        this.#input.value="";
+        this.#update();
+        return;
+      }
       const expression=math.compile(text);
       const results=[];
       for (let i=0;i<repeatCount;i++) {

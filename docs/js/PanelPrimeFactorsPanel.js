@@ -48,14 +48,23 @@ class PrimeFactorsPanel extends Panel {
     this.#update();
   }
 
+  #inputIDCounter=0;
+
   #createInput(parent, labelText, initialValue) {
+    /*
+    const div=document.createElement("span");
+    parent.appendChild(div);
+    div.className="flex-.nowrap";
+    */
+   const div=parent;
+
     const label=document.createElement("label");
-    parent.appendChild(label);
+    div.appendChild(label);
     label.innerHTML=labelText;
     label.style.paddingRight="10px";
 
     const input=document.createElement("input");
-    parent.appendChild(input);
+    div.appendChild(input);
     input.type="text";
     input.spellcheck=false;
     input.className="form-control";
@@ -65,7 +74,8 @@ class PrimeFactorsPanel extends Panel {
     input.value=initialValue;
     input.oninput=()=>this.#update();
 
-    label.htmlFor=input;
+    label.htmlFor=input.id="prime-factor-input"+this.#inputIDCounter;
+    this.#inputIDCounter++;
 
     return input;
   }

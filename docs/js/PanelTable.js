@@ -66,6 +66,7 @@ class TablePanel extends Panel {
     this.#mode.className="form-select me-3";
     this.#mode.style.display="inline-block";
     this.#mode.style.width="unset";
+    this.#mode.id="table-mode";
     let option;
     this.#mode.appendChild(option=document.createElement("option"));
     option.innerHTML=language.table.modeFunction;
@@ -73,16 +74,16 @@ class TablePanel extends Panel {
     this.#mode.appendChild(option=document.createElement("option"));
     option.innerHTML=language.table.modeSequence;
     option.value=1;
-    label.htmlFor=this.#mode;
+    label.htmlFor="table-mode";
     this.#mode.onchange=()=>this.#updateTable();
 
     /* Function input - line 1 */
     div.appendChild(this.#functionLine1=document.createElement("span"));
-    this.#functionInput=this.#createInput(this.#functionLine1,500,"x^2",language.table.functionPlaceholder,"f(x):=");
+    this.#functionInput=this.#createInput(this.#functionLine1,this._isSmartphone?200:500,"x^2",language.table.functionPlaceholder,"f(x):=");
 
     /* Sequence input - line 1 */
     div.appendChild(this.#sequenceLine1=document.createElement("span"));
-    this.#sequenceInput=this.#createInput(this.#sequenceLine1,500,"-a/2",language.table.sequencePlaceholder,"a<sub>n+1</sub>:=");
+    this.#sequenceInput=this.#createInput(this.#sequenceLine1,this._isSmartphone?200:500,"-a/2",language.table.sequencePlaceholder,"a<sub>n+1</sub>:=");
 
     const button=this.#createButton(div,"",language.calc.ExpressionBuilder,"code",()=>{
     if (isDesktopApp) {
@@ -159,8 +160,10 @@ class TablePanel extends Panel {
     parent.appendChild(label);
     label.className="form-label pe-2";
     label.innerHTML=text;
-    return parent;
+    return label;
   }
+
+  #inputIDCounter=0;
 
   #createInput(parent, width, value, placeholder, labelText) {
     const label=this.#createLabel(parent,labelText);
@@ -169,11 +172,13 @@ class TablePanel extends Panel {
     parent.appendChild(input);
     input.className="form-control me-2";
     input.style.display="inline-block";
-    input.style.width=width+"px";
+    input.style.maxWidth=width+"px";
     if (value) input.value=value;
     if (placeholder) input.placeholder=placeholder;
-    label.htmlFor=input;
     input.oninput=()=>this.#updateTable();
+
+    label.htmlFor=input.id="table-input-"+this.#inputIDCounter;
+    this.#inputIDCounter++;
 
     return input;
   }

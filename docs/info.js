@@ -136,20 +136,20 @@ row.className="row align-items-start";
 /* Tree */
 const treeArea=document.createElement("div");
 row.appendChild(treeArea);
-treeArea.className="col-3 h-100";
+treeArea.className="col-lg-3 col-sm-6 h-100";
 treeArea.style.overflowY="scroll";
 
 /* Info */
 const infoArea=document.createElement("div");
 row.appendChild(infoArea);
-infoArea.className="col-9 h-100";
+infoArea.className="col-lg-9 col-sm-6 h-100";
 infoArea.innerHTML=language.expressionBuilder.placeholderInfo;
 infoArea.style.overflowY="scroll";
 
 /* Footer */
 const nav=document.createElement("nav");
 mainContent.appendChild(nav);
-nav.className="navbar sticky-bottom navbar-expand navbar-dark p-3";
+nav.className="navbar fixed-bottom navbar-expand navbar-dark p-3";
 const insertButton=document.createElement("button");
 nav.appendChild(insertButton);
 insertButton.type="button";
@@ -182,15 +182,6 @@ setTimeout(()=>{
   initSizeCalculation();
   setMinWidth(800);
 },0);
-
-/* Update size */
-function updateSize() {
-  const availableHeight=window.innerHeight-nav.clientHeight-10;
-  row.style.height=availableHeight+"px";
-  infoSpan.style.lineHeight=Math.round(nav.clientHeight/window.devicePixelRatio)+"px";
-}
-addEventListener("resize",()=>updateSize());
-updateSize();
 
 /* Connection to main window */
 let sourceWindow=null;
