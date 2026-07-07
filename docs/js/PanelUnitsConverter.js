@@ -112,7 +112,8 @@ function initConverter() {
     {name: language.units.areaAr, unit: "a", factor: 100, wiki: language.units.areaArWiki},
     {name: language.units.areaMorgen, unit: "mg", factor: 2500, wiki: language.units.areaMorgenWiki},
     {name: language.units.areaSoccerFields, factor: 7140, wiki: language.units.areaSoccerFieldsWiki, moreNames: ["Fußballfeld"]},
-    {name: language.units.areaSaarland, factor: 1000000*2569.69, wiki: language.units.areaSaarlandWiki}
+    {name: language.units.areaSaarland, factor: 1000000*2569.69, wiki: language.units.areaSaarlandWiki},
+    {name: language.units.areaGermany, factor: 1000000*357684, wiki: language.units.areaGermanyWiki}
   ]);
 
   convertDataVolume.push(...[
@@ -259,7 +260,7 @@ class UnitsConverterPanel extends Panel {
     this.#select.onchange=()=>this.#selectPanel();
     this.#select.style.display="inline-block";
     this.#select.style.width="200px";
-    label.htmlFor=this.#select;
+    label.htmlFor=this.#select.id="unit-converter-select";
 
     /* Panels */
     initConverter();
@@ -296,6 +297,8 @@ class UnitsConverterPanel extends Panel {
     this.#options.push(panel);
   }
 
+  #inputIDCounter=0;
+
   #buildUnitsPanel(name, data) {
     this.#factors.push(data);
 
@@ -316,6 +319,7 @@ class UnitsConverterPanel extends Panel {
       label.innerHTML=rec.name+":";
       label.style.paddingRight="10px";
       if (rec.info) label.title=rec.info;
+      if (this._isSmartphone) label.classList.add("small");
 
       tr.appendChild(td=document.createElement("td"));
       const edit=document.createElement("input");
@@ -324,7 +328,8 @@ class UnitsConverterPanel extends Panel {
       edit.className="form-control";
       edit.type="text";
       edit.spellcheck=false;
-      label.htmlFor=label;
+      label.htmlFor=edit.id="unit-converter-input-"+this.#inputIDCounter;
+      this.#inputIDCounter++;;
       if (rec.initialValue) edit.value=formatNumberMax(rec.initialValue);
       edit.oninput=()=>this.#inputChanged(edit);
 
