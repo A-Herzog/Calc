@@ -20,6 +20,7 @@ import {Panel} from './Panel.js';
 import {getFloat, formatNumber} from './NumberTools.js';
 import {preprocessInput, formatMathResult} from './MathJSTools.js';
 import {ibeta} from '../libs/jstat-special.js';
+import {autocorrelation} from './StatTools.js';
 import {language} from './Language.js';
 
 
@@ -380,6 +381,9 @@ class StatisticsPanel extends Panel {
       arr.push(num);
     }
     const mean=(numberCount>0)?(sum/numberCount):null;
+
+    const ac=autocorrelation(arr,Math.min(20,arr.length-2));
+
     arr.sort();
     let median=null;
     if (arr.length>0) median=(arr.length%2==0)?((arr[arr.length/2-1]+arr[arr.length/2])/2):arr[(arr.length-1)/2];
@@ -406,6 +410,11 @@ class StatisticsPanel extends Panel {
       output.push(language.statistics.sd+": <b>"+mathSD+"="+formatNumber(sd,8)+"</b>");
       if (mean!=0) output.push(language.statistics.cv+": <b>"+mathCV+"="+formatNumber(sd/Math.abs(mean),8)+"</b>");
       for (let level of [0.9, 0.95, 0.99]) output.push(language.statistics.confidenceInterval+" "+(level*100).toLocaleString()+"%: "+this.#getConfidenceInterval(numberCount,mean,sd,level));
+    }
+
+    for (let i=1;i<ac.length;i++) {
+      output.push(language.statistics.autocorrelation+"n="+i+": "+formatNumber(ac[i],3));
+      if (Math.abs(ac[i])<0.001) break;
     }
 
     this.#output.innerHTML=output.join("<br>");
