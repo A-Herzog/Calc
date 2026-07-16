@@ -342,9 +342,14 @@ class UnitsConverterPanel extends Panel {
           span.style.paddingLeft="10px";
         }
         if (rec.wiki) {
-          const span=document.createElement("span");
-          td.appendChild(span);
+          let span;
+          td.appendChild(span=document.createElement("span"));
+          span.className="wikilink_large";
           span.innerHTML="(<a href='"+rec.wiki+"' target='_blank'>Wikipedia</a>)";
+          span.style.paddingLeft="10px";
+          td.appendChild(span=document.createElement("span"));
+          span.className="wikilink_small";
+          span.innerHTML="(<a href='"+rec.wiki+"' target='_blank'>Wiki</a>)";
           span.style.paddingLeft="10px";
         }
       }

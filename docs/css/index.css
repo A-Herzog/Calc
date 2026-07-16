@@ -61,6 +61,25 @@ footer a {
   }
 }
 
+  .wikilink_small {
+    display: none;
+    font-size: 80%;
+  }
+
+  .wikilink_large {
+    display: inline;
+  }
+
+@media only screen and (max-width: 400px) {
+  .wikilink_small {
+    display: inline;
+  }
+
+  .wikilink_large {
+    display: none;
+  }
+}
+
 table.table-fit {
   width: auto !important;
   table-layout: auto !important;
