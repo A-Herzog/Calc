@@ -30,6 +30,8 @@ class Panel {
    */
   _isSmartphone;
 
+  #permalinkUpdater;
+
   constructor() {
     this._panel=document.createElement("div");
     this._isSmartphone=(screen.width<550);
@@ -92,6 +94,45 @@ class Panel {
 
   _firstShow() {
 
+  }
+
+  /**
+   * Returns an optional key for a permalink to this tab.
+   * (If an empty string is returned, no permalink processing is offered for this tab.)
+   * @returns Key for permalinks (can be empty)
+   */
+  getPermaKey() {
+    return "";
+  }
+
+  /**
+   * Returns an object containing the data to be stored in the permalink.
+   * @returns Object containing the permalink data
+   */
+  getPermaData() {
+    return {};
+  }
+
+  /**
+   * Loads data from a permalink setup object into the panel.
+   * @param {object} data Permalink setup data
+   */
+  loadFromPerma(data) {
+  }
+
+  /**
+   * Registers a callback for updating the permalink.
+   * @param {object} updater Callback which is to be called when the permalink is to be updated
+   */
+  registerPermalinkUpdater(updater) {
+    this.#permalinkUpdater=updater;
+  }
+
+  /**
+   * Notifies the system about an permalink update.
+   */
+  _firePermalinkUpdate() {
+    if (typeof(this.#permalinkUpdater)!='undefined') this.#permalinkUpdater();
   }
 }
 

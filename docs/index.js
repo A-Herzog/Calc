@@ -51,18 +51,35 @@ tabs.add(language.GUI.tabUnits,"globe",new UnitsConverterPanel());
 tabs.add(language.GUI.tabStatistics,"bar-chart",new StatisticsPanel());
 
 /* Add tabs to DOM */
-mainContent.appendChild(tabs.nav);
-mainContent.appendChild(tabs.main);
 if (!isDesktopApp) {
   const footer=document.createElement("footer");
   footer.className="page-footer font-small small border-top p-2 "+((document.documentElement.dataset.bsTheme=='light')?"bg-light":"bg-dark");
-  footer.innerHTML=language.GUI.name+' &copy; <a href="https://github.com/A-Herzog" target="_blank">Alexander Herzog</a> &middot; <a href="https://github.com/A-Herzog/Calc" target="_blank" class="bi-github"> GitHub</a>';
+  footer.innerHTML=language.GUI.name+' &copy; <a href="https://github.com/A-Herzog" target="_blank">Alexander Herzog</a> &middot; <a href="https://github.com/A-Herzog/Calc" target="_blank" class="bi-github"> GitHub</a> <span id="PermalinkOuter" style="display: none;">&middot; <a id="Permalink" href="" target="_blank">Permalink</a></span>';
   document.body.appendChild(footer);
 }
+mainContent.appendChild(tabs.nav);
+mainContent.appendChild(tabs.main);
 
 /* Make GUI visible */
 mainContent.style.display="";
 if (typeof(infoLoading)!='undefined') infoLoading.style.display="none";
+
+/* Process parameters */
+if (window.location.search.length>0 && window.location.search.startsWith("?")) {
+  const setup={};
+  let name="";
+  for (let rec of window.location.search.substring(1).split("&")) {
+    const data=rec.split("=",2);
+    if (data.length!=2) continue;
+    if (data[0]=='function') {
+      name=data[1];
+    } else {
+      setup[data[0]]=decodeURIComponent(data[1]);
+    }
+  }
+  if (name!='') tabs.showTabByPermlinkName(name,setup);
+}
+tabs.initDone();
 
 /* Calculate size for window */
 setTimeout(()=>{

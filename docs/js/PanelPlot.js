@@ -60,6 +60,7 @@ class PlotPanel extends Panel {
   #inputGraphData=[];
   #tableData="";
   #axisCenter=false;
+  #moreButton;
 
   constructor() {
     super();
@@ -157,10 +158,7 @@ class PlotPanel extends Panel {
     });
 
     /* More graphs button */
-    const moreButton=this.#addButton(canvasInfo,"plus-circle","success",language.plot.more,language.plot.moreHint,()=>{
-      for (let graph of this.#graphData2) this.#addGraph(graph);
-      moreButton.style.display="none";
-    });
+    this.#moreButton=this.#addButton(canvasInfo,"plus-circle","success",language.plot.more,language.plot.moreHint,()=>this.#addMoreGraphs());
 
     /* Axis setup */
     this._panel.appendChild(line=document.createElement("div"));
@@ -244,6 +242,11 @@ class PlotPanel extends Panel {
 
     /* Start */
     this.#updateChart();
+  }
+
+  #addMoreGraphs() {
+    for (let graph of this.#graphData2) this.#addGraph(graph);
+    this.#moreButton.style.display="none";
   }
 
   #addGraph(graph) {
@@ -550,6 +553,8 @@ class PlotPanel extends Panel {
     }
 
     this.#tableData=table.join("\n");
+
+    this._firePermalinkUpdate();
   }
 
   #justZooming=false;
@@ -669,5 +674,61 @@ class PlotPanel extends Panel {
 
   getMinHeight() {
     return 1000;
+  }
+
+  getPermaKey() {
+    return "plot";
+  }
+
+  getPermaData() {
+    const setup={};
+    if (this.#inputXMin.value!='-10') setup["minX"]=this.#inputXMin.value;
+    if (this.#inputXMax.value!='10') setup["maxX"]=this.#inputXMax.value;
+    if (this.#inputYMin.value!='-10') setup["minY"]=this.#inputYMin.value;
+    if (this.#inputYMax.value!='10') setup["maxY"]=this.#inputYMax.value;
+    if (this.#inputTMin.value!='-10') setup["minT"]=this.#inputTMin.value;
+    if (this.#inputTMax.value!='10') setup["maxT"]=this.#inputTMax.value;
+    if (this.#inputUMin.value!='-10') setup["minU"]=this.#inputUMin.value;
+    if (this.#inputUMax.value!='10') setup["maxU"]=this.#inputUMax.value;
+    if (this.#rangeT.value!='550') setup['T']=this.#rangeT.value;
+    if (this.#rangeU.value!='550') setup['U']=this.#rangeU.value;
+    for (let i=0;i<this.#inputGraph.length;i++) {
+      const input=this.#inputGraph[i];
+      if (input.value.trim()!='') setup["graph"+i]=input.value;
+    }
+    return setup;
+  }
+
+  loadFromPerma(data) {
+    let update=false;
+    let more=false;
+
+    if (typeof(data.minX)=='string') {this.#inputXMin.value=data.minX; update=true;}
+    if (typeof(data.maxX)=='string') {this.#inputXMax.value=data.maxX; update=true;}
+    if (typeof(data.minY)=='string') {this.#inputYMin.value=data.minY; update=true;}
+    if (typeof(data.maxY)=='string') {this.#inputYMax.value=data.maxY; update=true;}
+    if (typeof(data.minT)=='string') {this.#inputTMin.value=data.minT; update=true;}
+    if (typeof(data.maxT)=='string') {this.#inputTMax.value=data.maxT; update=true;}
+    if (typeof(data.minU)=='string') {this.#inputUMin.value=data.minU; update=true;}
+    if (typeof(data.maxU)=='string') {this.#inputUMax.value=data.maxU; update=true;}
+    if (typeof(data.T)=='string') {this.#rangeT.value=data.T; update=true;}
+    if (typeof(data.U)=='string') {this.#rangeU.value=data.U; update=true;}
+    for (let i=0;i<6;i++) {
+      if (typeof(data["graph"+i])=='undefined') {
+        if (i<=2) {
+          this.#inputGraph[i].value="";
+          update=true;
+        }
+        continue;
+      }
+      if (i>2 && !more) {
+        this.#addMoreGraphs();
+        more=true;
+      }
+      this.#inputGraph[i].value=data["graph"+i];
+      update=true;
+    }
+
+    if (update) this.#updateChart();
   }
 }

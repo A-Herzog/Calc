@@ -27,6 +27,7 @@ class Tabs {
 
   #navUl;
   #mainDiv;
+  #currentTab;
 
   /**
    * Adds a panel to the panels list.
@@ -41,6 +42,11 @@ class Tabs {
     } else {
       this.#data.splice(index,0,{name: name, icon: icon, tab: tab, panel: tab.panel});
     }
+    tab.registerPermalinkUpdater(()=>this.#updatePermalink());
+  }
+
+  #updatePermalink() {
+    Permalink.href=window.location.protocol+"//"+window.location.host+window.location.pathname+"?"+this.#getPermalink();
   }
 
   /**
@@ -218,12 +224,13 @@ class Tabs {
 
     for (let i=0;i<this.#data.length;i++) this.addMain(i,i==0);
 
+    this.#currentTab=this.#data[0].tab;
+    PermalinkOuter.style.display=(isDesktopApp || this.#currentTab.getPermaKey()=='')?"none":"";
+
     return div;
   }
 
-  #showTab(a) {
-    let index=0;
-    for (let i=0;i<this.#data.length;i++) if (this.#data[i].a==a) {index=i; break;}
+  #showTabByIndex(index) {
     for (let i=0;i<this.#data.length;i++) {
       const rec=this.#data[i];
       rec.a.classList.toggle("active",index==i);
@@ -241,5 +248,46 @@ class Tabs {
         setMinHeight(requestedMinHeight,false);
       }
     },10);
+
+    this.#currentTab=rec.tab;
+    PermalinkOuter.style.display=(isDesktopApp || this.#currentTab.getPermaKey()=='')?"none":"";
+
+    return rec.tab;
+  }
+
+  #showTab(a) {
+    let index=0;
+    for (let i=0;i<this.#data.length;i++) if (this.#data[i].a==a) {index=i; break;}
+    this.#showTabByIndex(index);
+    this.#updatePermalink();
+  }
+
+  /**
+   * Loads data into a panel from permalink information.
+   * @param {string} name Permalink name of the panel
+   * @param {object} setup Permalink data to be loaded into the panel
+   */
+  showTabByPermlinkName(name, setup) {
+    let index=-1;
+    for (let i=0;i<this.#data.length;i++) if (this.#data[i].tab.getPermaKey()==name) {index=i; break;}
+    if (index<0) return;
+    const tab=this.#showTabByIndex(index);
+    tab.loadFromPerma(setup);
+  }
+
+  #getPermalink() {
+    let result="function="+this.#currentTab.getPermaKey();
+    const data=this.#currentTab.getPermaData();
+    for (let key in data) {
+      result+="&"+key+"="+encodeURIComponent(data[key]);
+    }
+    return result;
+  }
+
+  /**
+   * Is called when initializing the tabs and loading the data (from URL search parameters) is done.
+   */
+  initDone() {
+    this.#updatePermalink();
   }
 }

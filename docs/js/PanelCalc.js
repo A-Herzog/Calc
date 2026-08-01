@@ -207,6 +207,8 @@ class CalcPanel extends Panel {
       this.#editOutput.value='';
       this.#showError(e.message);
     }
+
+    this._firePermalinkUpdate();
   }
 
   #showSubPanel(nr) {
@@ -228,5 +230,22 @@ class CalcPanel extends Panel {
     for (let i=0;i<this.#panels.length;i++) this.#panels[i].setVisible(current==i);
 
     setMinHeight(this._panel.scrollHeight,true);
+  }
+
+  getPermaKey() {
+    return "Calc";
+  }
+
+  getPermaData() {
+    const setup={};
+    if (this.#editInput.value.trim()!='') setup["input"]=this.#editInput.value.trim();
+    return setup;
+  }
+
+  loadFromPerma(data) {
+    if (typeof(data.input)=='string') {
+      this.#editInput.value=data.input;
+      this.#calc();
+    }
   }
 }
