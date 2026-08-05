@@ -211,6 +211,8 @@ class TablePanel extends Panel {
     } else {
       this.#updateSequence();
     }
+
+    this._firePermalinkUpdate();
   }
 
   #updateFunction() {
@@ -353,5 +355,44 @@ class TablePanel extends Panel {
 
   getMinHeight() {
     return 850;
+  }
+
+  getPermaKey() {
+    return "Table";
+  }
+
+  getPermaData() {
+    const mode=parseInt(this.#mode.value);
+    const setup={mode: mode};
+    if (mode==0) {
+      setup["text"]=this.#functionInput.value;
+      setup["min"]=this.#functionMin.value;
+      setup["max"]=this.#functionMax.value;
+      setup["wide"]=this.#functionWide.value;
+    } else {
+      setup["text"]=this.#sequenceInput.value;
+      setup["start"]=this.#sequenceStart.value;
+      setup["steps"]=this.#sequenceSteps.value;
+    }
+    return setup;
+  }
+
+  loadFromPerma(data) {
+    if (typeof(data.mode)!='string' || (data.mode!='0' && data.mode!='1')) return;
+    const mode=parseInt(data.mode);
+
+    this.#mode.value=""+mode;
+    if (mode==0) {
+      if (typeof(data.text)=='string') this.#functionInput.value=data.text;
+      if (typeof(data.min)=='string') this.#functionMin.value=data.min;
+      if (typeof(data.max)=='string') this.#functionMax.value=data.max;
+      if (typeof(data.wide)=='string') this.#functionWide.value=data.wide;
+    } else {
+      if (typeof(data.text)=='string') this.#sequenceInput.value=data.text;
+      if (typeof(data.start)=='string') this.#sequenceStart.value=data.start;
+      if (typeof(data.steps)=='string') this.#sequenceSteps.value=data.steps;
+    }
+
+    this.#updateTable();
   }
 }

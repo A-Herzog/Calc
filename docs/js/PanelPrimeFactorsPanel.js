@@ -168,6 +168,26 @@ class PrimeFactorsPanel extends Panel {
     output.push("Eulersche &phi;-Funktion von Zahl 1: <b>&phi;("+num1+")="+getPhi(collectedFactors1)+"</b> (<a href='"+language.primeFactors.phiWikipedia+"' target='_blank'>Wikipedia</a>)");
     output.push("Eulersche &phi;-Funktion von Zahl 2: <b>&phi;("+num2+")="+getPhi(collectedFactors2)+"</b> (<a href='"+language.primeFactors.phiWikipedia+"' target='_blank'>Wikipedia</a>)");
     this.#output.innerHTML=output.join("<br>");
+
+    this._firePermalinkUpdate();
+  }
+
+getPermaKey() {
+    return "Factors";
+  }
+
+  getPermaData() {
+    const setup={A: this.#input1.value, B: this.#input2.value};
+    return setup;
+  }
+
+  loadFromPerma(data) {
+    if (typeof(data.A)!='string' || typeof(data.B)!='string') return;
+
+    this.#input1.value=data.A;
+    this.#input2.value=data.B;
+
+    this.#update();
   }
 }
 

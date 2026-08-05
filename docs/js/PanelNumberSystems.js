@@ -107,7 +107,7 @@ class NumberSystemsPanel extends Panel {
       this.#freeBase.className="form-control";
       this.#freeBase.style.display="inline-block";
       this.#freeBase.style.width="100px";
-      this.#freeBase.oninput=()=>this.#calc(this.#freeBase);
+      this.#freeBase.oninput=()=>this.#calc(this.#bases[4].edit);
       label2.htmlFor=this.#freeBase.id="number-systems-free-base-select";
     }
   }
@@ -157,6 +157,8 @@ class NumberSystemsPanel extends Panel {
         }
       }
     }
+
+    this._firePermalinkUpdate();
   }
 
   /*
@@ -203,5 +205,33 @@ class NumberSystemsPanel extends Panel {
     str=intPartStr+c+str.substring(str.length-steps);
 
     return (minus?"-":"")+str;
+  }
+
+  getPermaKey() {
+    return "Numbers";
+  }
+
+  getPermaData() {
+    const setup={base10: this.#bases[2].edit.value.replace(",",".")};
+    if (this.#freeBase.value!='10') setup["freeBase"]=this.#freeBase.value;
+    return setup;
+  }
+
+  loadFromPerma(data) {
+    if (typeof(data.base10)!='string') return;
+
+    if (typeof(data.freeBase)=='string') {
+      this.#freeBase.value=data.freeBase;
+    }
+
+    let base10value=0;
+    try {
+      base10value=parseFloat(data.base10);
+    } catch (error) {
+      return;
+    }
+
+    this.#bases[2].edit.value=base10value;
+    this.#calc(this.#bases[2].edit);
   }
 }
