@@ -425,6 +425,9 @@ lang.expressionBuilder.consts.e.info="Eulersche Zahl, e&approx;"+formatNumberMax
 lang.expressionBuilder.consts.phi={};
 lang.expressionBuilder.consts.phi.name="Goldener Schnitt";
 lang.expressionBuilder.consts.phi.info="Liefert den Wert es goldenen Schnitts, d.h. den Wert <math><mi>&Phi;</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><msqrt><mn>5</mn></msqrt></mrow><mn>2</mn></mfrac><mo>&approx;</mo><mn>"+formatNumberMax((1+Math.sqrt(5))/2)+"</mn></math>.";
+lang.expressionBuilder.consts.eulergamma={};
+lang.expressionBuilder.consts.eulergamma.name="Euler-Mascheroni-Konstante";
+lang.expressionBuilder.consts.eulergamma.info="Euler-Mascheroni-Konstante, &gamma;&approx;"+formatNumberMax(0.577215664901532)+".";
 lang.expressionBuilder.consts.i={};
 lang.expressionBuilder.consts.i.name="Komplexe Basiseinheit";
 lang.expressionBuilder.consts.i.info="Komplexe Basiseinheit, <tt>sqrt(-1)=i</tt>.";
@@ -1334,6 +1337,9 @@ lang.expressionBuilder.consts.e.info="Euler's number, e&approx;"+formatNumberMax
 lang.expressionBuilder.consts.phi={};
 lang.expressionBuilder.consts.phi.name="Golden ratio";
 lang.expressionBuilder.consts.phi.info="Golden ratio value, <math><mi>&Phi;</mi><mo>=</mo><mfrac><mrow><mn>1</mn><mo>+</mo><msqrt><mn>5</mn></msqrt></mrow><mn>2</mn></mfrac><mo>&approx</mo><mn>"+formatNumberMax((1+Math.sqrt(5))/2)+"</mn></math>.";
+lang.expressionBuilder.consts.eulergamma={};
+lang.expressionBuilder.consts.eulergamma.name="Euler-Mascheroni constant";
+lang.expressionBuilder.consts.eulergamma.info="Euler-Mascheroni constant, &gamma;&approx;"+formatNumberMax(0.5772156649015329)+".";
 lang.expressionBuilder.consts.i={};
 lang.expressionBuilder.consts.i.name="Complex basis unit";
 lang.expressionBuilder.consts.i.info="Complex basis unit, <tt>sqrt(-1)=i</tt>.";

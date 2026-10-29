@@ -157,6 +157,7 @@ function buildExpressions() {
     {symbol: "tau", data: "tau"},
     {symbol: "e", data: "e"},
     {symbol: "phi", data: "phi"},
+    {symbol: "eulergamma", data: "eulergamma"},
     {symbol: "i", data: "i"}
   ]));
 

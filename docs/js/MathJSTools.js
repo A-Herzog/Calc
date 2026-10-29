@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect}
+export {preprocessInput, formatMathResult, loadMathJSExtensions, binomDirect, defaultScope}
 
 import {formatNumber, getFloatBase} from './NumberTools.js';
 import {betafn, lowRegGamma} from '../libs/jstat-special.js';
@@ -521,3 +521,7 @@ function formatMathResult(result) {
   /* Unknown object format */
   return ""+result;
 }
+
+const defaultScope={
+  eulergamma: 0.577215664901532
+};

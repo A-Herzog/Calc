@@ -22,7 +22,7 @@ import {CalcPanelSubKeys} from './PanelCalcSubKeys.js';
 import {CalcPanelSubConsts} from './PanelCalcSubConsts.js';
 import {CalcPanelSubFunctions} from './PanelCalcSubFunctions.js';
 import {CalcPanelSubInfo} from './PanelCalcSubInfo.js';
-import {preprocessInput, formatMathResult, loadMathJSExtensions} from './MathJSTools.js';
+import {preprocessInput, formatMathResult, loadMathJSExtensions, defaultScope} from './MathJSTools.js';
 import {loadMathJSDistributionExtensions} from './MathJSDistributionTools.js';
 import {language} from './Language.js';
 
@@ -196,7 +196,7 @@ class CalcPanel extends Panel {
   }
 
   #calc() {
-    const scope={};
+    const scope={...defaultScope};
     this.#panelConsts.addToScope(scope);
     this.#panelFunctions.addToScope(scope);
 
